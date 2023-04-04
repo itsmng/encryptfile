@@ -20,10 +20,11 @@ if (empty($_GET["id"])) {
 }
 
 $pluginEncryptfileConfigs = new PluginEncryptfileConfig();
+$pluginEncryptfileEncrypt = new PluginEncryptfileEncrypt();
 
 if (isset($_POST["add"])) {
 	$pluginEncryptfileConfigs->check(-1, CREATE);
-
+	$_POST["key"] = $pluginEncryptfileEncrypt->generateKey();
 	if ($newID = $pluginEncryptfileConfigs->add($_POST)) {
 		if ($_SESSION['glpibackcreated']) {
 			Html::redirect($pluginEncryptfileConfigs->getFormURL() . "?id=" . $newID);
