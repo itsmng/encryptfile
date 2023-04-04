@@ -1,1 +1,1 @@
-# Encrypt file plugin
+# Encrypt file plugin for GLPI
