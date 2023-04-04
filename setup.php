@@ -21,6 +21,7 @@ function plugin_init_encryptfile() {
 	$PLUGIN_HOOKS['csrf_compliant']['encryptfile'] = true;
 
 	Plugin::registerClass(PluginEncryptfileProfile::class, ['addtabon' => ['Profile']]);
+	Plugin::registerClass(PluginEncryptfileEncrypt::class);
 
 	$PLUGIN_HOOKS['change_profile']['encryptfile']   = array(PluginEncryptfileProfile::class, 'initProfile');
 
