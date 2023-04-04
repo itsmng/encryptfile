@@ -1,9 +1,15 @@
 <?php
-/*** 
--------------------------------------------------------------------------
- encryptfile plugin for GLPI
--------------------------------------------------------------------------
- ***/
+/**
+ * @package     encryptfile
+ * @author      Charlene Auger
+ * @copyright   Copyright (c) 2015-2023 FactorFX
+ * @license     AGPL License 3.0 or (at your option) any later version
+ *              http://www.gnu.org/licenses/agpl-3.0-standalone.html
+ * @link        https://www.factorfx.com
+ * @since       2023
+ *
+ * --------------------------------------------------------------------------
+ */
 
 class PluginEncryptfileProfile extends Profile {
     
@@ -55,12 +61,19 @@ class PluginEncryptfileProfile extends Profile {
             echo "<form method='post' action='".$profile->getFormURL()."'>";
         }
 
-        $rights = [[
-            'itemtype'  => 'PluginEncryptfileEncrypt',
-            'label'     => PluginEncryptfileEncrypt::getTypeName(Session::getPluralNumber()),
-            'rights'    => [READ =>__('Decrypt', 'encryptfile'), UPDATE => __('Encrypt', 'encryptfile')],
-            'field'     => 'plugin_encryptfile_encrypt'
-        ]];
+        $rights = [
+            [
+                'itemtype'  => 'PluginEncryptfileEncrypt',
+                'label'     => PluginEncryptfileEncrypt::getTypeName(Session::getPluralNumber()),
+                'rights'    => [READ =>__('Decrypt', 'encryptfile'), UPDATE => __('Encrypt', 'encryptfile')],
+                'field'     => 'plugin_encryptfile_encrypt'
+            ],
+            [
+                'itemtype'  => 'PluginEncryptfileConfig',
+                'label'     => PluginEncryptfileConfig::getTypeName(Session::getPluralNumber()),
+                'field'     => 'plugin_encryptfile_configs'
+            ]
+        ];
 
         $matrix_options['title'] = __('Encrypted file', 'encryptfile');
         $profile->displayRightsChoiceMatrix($rights, $matrix_options);
