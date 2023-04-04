@@ -1,9 +1,15 @@
 <?php
-/*** 
--------------------------------------------------------------------------
- encryptfile plugin for GLPI
--------------------------------------------------------------------------
- ***/
+/**
+ * @package     encryptfile
+ * @author      Charlene Auger
+ * @copyright   Copyright (c) 2015-2023 FactorFX
+ * @license     AGPL License 3.0 or (at your option) any later version
+ *              http://www.gnu.org/licenses/agpl-3.0-standalone.html
+ * @link        https://www.factorfx.com
+ * @since       2023
+ *
+ * --------------------------------------------------------------------------
+ */
 
 /**
  * plugin_encryptfile_install
@@ -21,7 +27,8 @@ function plugin_encryptfile_install() {
             `id` INT(11) NOT NULL AUTO_INCREMENT,
             `name` VARCHAR(255) NOT NULL,
             `status` BOOLEAN NOT NULL DEFAULT 0,
-            `description` VARCHAR(255) DEFAULT NULL,
+            `comment` VARCHAR(255) DEFAULT NULL,
+            `profiles_id` INT(11) NOT NULL DEFAULT 0,
             `key` TEXT NOT NULL,
             PRIMARY KEY (`id`)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;";
@@ -35,7 +42,6 @@ function plugin_encryptfile_install() {
             `id` INT(11) NOT NULL AUTO_INCREMENT,
             `keys_id` INT(11) NOT NULL DEFAULT 0,
             `profiles_id` INT(11) NOT NULL DEFAULT 0,
-            `status` TINYINT(1) NOT NULL DEFAULT 1,
             PRIMARY KEY (`id`)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;";
 
