@@ -105,25 +105,26 @@ class PluginEncryptfileConfig extends CommonDBTM {
      */
     public function getSearchOptions() {
         $tab = array();
-        $tab['common'] = __s('Characteristics');
+        $tab['common'] = __('Characteristics');
 
         $tab[1]['table'] = $this->getTable();
         $tab[1]['field'] = 'name';
-        $tab[1]['name'] = __s('Name');
+        $tab[1]['name'] = __('Name');
         $tab[1]['datatype'] = 'itemlink';
         $tab[1]['massiveaction'] = false;
 
         $tab[2]['table'] = $this->getTable();
         $tab[2]['field'] = 'id';
-        $tab[2]['name'] = __s('ID');
+        $tab[2]['name'] = __('ID');
         $tab[2]['massiveaction'] = false;
         $tab[2]['datatype'] = 'number';
 
         $tab[3]['table'] = $this->getTable();
         $tab[3]['field'] = 'comment';
-        $tab[3]['name'] = __s('Comments');
+        $tab[3]['name'] = __('Comments');
         $tab[3]['datatype'] = 'text';
         $tab[3]['massiveaction'] = false;
+        $tab[3]['htmltext'] = true;
 
         return $tab;
     }
