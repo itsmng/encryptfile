@@ -23,4 +23,13 @@ class PluginEncryptfileEncrypt extends CommonDBTM {
     public static function getTypeName($nb = 1) {
         return _n('Encrypted file', 'Encrypted files', $nb, 'encryptfile');
     }
+    
+    /**
+     * generateKey
+     *
+     * @return void
+     */
+    public function generateKey() {
+        return base64_encode(sodium_crypto_secretbox_keygen());
+    }
 } 
