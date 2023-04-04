@@ -1,9 +1,15 @@
 <?php
-/*** 
--------------------------------------------------------------------------
- encryptfile plugin for GLPI
--------------------------------------------------------------------------
- ***/
+/**
+ * @package     encryptfile
+ * @author      Charlene Auger
+ * @copyright   Copyright (c) 2015-2023 FactorFX
+ * @license     AGPL License 3.0 or (at your option) any later version
+ *              http://www.gnu.org/licenses/agpl-3.0-standalone.html
+ * @link        https://www.factorfx.com
+ * @since       2023
+ *
+ * --------------------------------------------------------------------------
+ */
 define('PLUGIN_ENCRYPTFILE_VERSION', '1.0.0');
 
 /**
@@ -15,6 +21,12 @@ function plugin_init_encryptfile() {
 	$PLUGIN_HOOKS['csrf_compliant']['encryptfile'] = true;
 
 	Plugin::registerClass(PluginEncryptfileProfile::class, ['addtabon' => ['Profile']]);
+
+	$PLUGIN_HOOKS['change_profile']['encryptfile']   = array(PluginEncryptfileProfile::class, 'initProfile');
+
+	if(Session::haveRight("plugin_encryptfile_configs", READ)) {
+        $PLUGIN_HOOKS['menu_toadd']['encryptfile'] = array('tools' => PluginEncryptfileConfig::class);
+    }
 }
 
 
