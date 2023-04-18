@@ -32,4 +32,14 @@ class PluginEncryptfileEncrypt extends CommonDBTM {
     public function generateKey() {
         return base64_encode(sodium_crypto_secretbox_keygen());
     }
+    
+    /**
+     * decryptkey
+     *
+     * @param  mixed $key
+     * @return void
+     */
+    public function decryptkey($key) {
+        return base64_decode($key);
+    }
 } 
