@@ -337,7 +337,7 @@ class PluginEncryptfileConfig extends CommonDBTM {
         $this->removeItemtype($id);
 
         foreach($post as $itemtype) {
-            $query = "INSERT INTO `glpi_plugin_encryptfile_items`(keys_id, itemtype) VALUES($id, $itemtype)";
+            $query = "INSERT INTO `glpi_plugin_encryptfile_items`(keys_id, itemtype) VALUES($id, '$itemtype')";
             $DB->query($query);
         }
     }
