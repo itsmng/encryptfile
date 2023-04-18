@@ -38,7 +38,14 @@ if (isset($_POST["add"])) {
 	$pluginEncryptfileConfigs->redirectToList();
 } else if (isset($_POST["update"])) {
 	$pluginEncryptfileConfigs->check($_POST["id"], UPDATE);
-	$pluginEncryptfileConfigs->update($_POST);
+	if(isset($_POST["profiles_id_reading"])) {
+		$pluginEncryptfileConfigs->updateReadingProfiles($_POST["id"], $_POST["profiles_id_reading"]);
+	} elseif(isset($_POST["itemtype"])) {
+		$pluginEncryptfileConfigs->updateItemtype($_POST["id"], $_POST["itemtype"]);
+	} else {
+		$pluginEncryptfileConfigs->update($_POST);
+	}
+	
 	Html::back();
 } else {
 	Html::header(PluginEncryptfileConfig::getTypeName(2), $_SERVER['PHP_SELF'], "tools", "PluginEncryptfileConfig");
