@@ -103,28 +103,40 @@ class PluginEncryptfileConfig extends CommonDBTM {
      *
      * @return void
      */
-    public function getSearchOptions() {
-        $tab = array();
-        $tab['common'] = __('Characteristics');
+    public function getSearchOptionsNew() {
+        $tab = [];
 
-        $tab[1]['table'] = $this->getTable();
-        $tab[1]['field'] = 'name';
-        $tab[1]['name'] = __('Name');
-        $tab[1]['datatype'] = 'itemlink';
-        $tab[1]['massiveaction'] = false;
+        $tab[] = [
+            'id'            => 'common',
+            'name'          => __('Characteristics')
+        ];
 
-        $tab[2]['table'] = $this->getTable();
-        $tab[2]['field'] = 'id';
-        $tab[2]['name'] = __('ID');
-        $tab[2]['massiveaction'] = false;
-        $tab[2]['datatype'] = 'number';
+        $tab[] = [
+            'id'            => '1',
+            'table'         => self::getTable(),
+            'field'         => 'name',
+            'name'          => __('Name'),
+            'datatype'      => 'itemlink',
+            'massiveaction' => false
+        ];
 
-        $tab[3]['table'] = $this->getTable();
-        $tab[3]['field'] = 'comment';
-        $tab[3]['name'] = __('Comments');
-        $tab[3]['datatype'] = 'text';
-        $tab[3]['massiveaction'] = false;
-        $tab[3]['htmltext'] = true;
+        $tab[] = [
+            'id'            => '2',
+            'table'         => self::getTable(),
+            'field'         => 'comment',
+            'name'          => __('Comment'),
+            'datatype'      => 'text',
+            'massiveaction' => false
+        ];
+
+        $tab[] = [
+            'id'            => '3',
+            'table'         => self::getTable(),
+            'field'         => 'status',
+            'name'          => __('Active'),
+            'datatype'      => 'bool',
+            'massiveaction' => false
+        ];
 
         return $tab;
     }
@@ -170,11 +182,24 @@ class PluginEncryptfileConfig extends CommonDBTM {
      * @return void
      */
     function showProfileForm() {
-        $this->showFormHeader();
-        
-        echo "temp";
+        $rand = mt_rand();
 
-        $this->showFormButtons();
+        $this->showFormHeader(["formtitle" => __("Profile configuration", "encryptfile")]);
+
+        $dd_params = [
+            'name'      => 'profiles_id_reading',
+            'values'    => $this->getReadingProfiles($_GET["id"]),
+            'display'   => true,
+            'rand'      => $rand,
+            'multiple'  => true,
+            'size'      => 3
+        ];
+        
+        echo "<tr class='tab_bg_1'><td>".__('Select reading profiles', 'encryptfile')."</td><td>";
+        Dropdown::showFromArray($dd_params['name'], $this->getProfiles(), $dd_params);
+        echo "</td>";
+
+        $this->showFormButtons(['candel' => false]);
     
         return true;
     }
@@ -185,12 +210,159 @@ class PluginEncryptfileConfig extends CommonDBTM {
      * @return void
      */
     function showItemForm() {
-        $this->showFormHeader();
-        
-        echo "temp";
+        $rand = mt_rand();
 
-        $this->showFormButtons();
+        $this->showFormHeader(["formtitle" => __("Item configuration", "encryptfile")]);
+        
+        $glpiObjects = [];
+
+        foreach(get_declared_classes() as $class){
+            if(Document::canApplyOn($class)) $glpiObjects[$class] = $class::getTypeName();
+        }
+
+        $dd_params = [
+            'name'      => 'itemtype',
+            'values'    => $this->getItemtype($_GET["id"]),
+            'display'   => true,
+            'rand'      => $rand,
+            'multiple'  => true,
+            'size'      => 3
+        ];
+        
+        echo "<tr class='tab_bg_1'><td>".__('Select GLPi object', 'encryptfile')."</td><td>";
+        Dropdown::showFromArray($dd_params['name'], $glpiObjects, $dd_params);
+        echo "</td>";
+
+        $this->showFormButtons(['candel' => false]);
     
         return true;
+    }
+    
+    /**
+     * getProfiles
+     *
+     * @return void
+     */
+    function getProfiles() {
+        $Profile = new Profile();
+        $allProfiles = $Profile->find();
+
+        $profiles = [];
+
+        foreach($allProfiles as $key => $values) {
+            $profiles[$key] = $values["name"];
+        }
+
+        return $profiles;
+    }
+    
+    /**
+     * getItemtype
+     *
+     * @param  mixed $id
+     * @param  mixed $itemtype
+     * @return void
+     */
+    function getItemtype($id, $itemtype = null) {
+        global $DB;
+
+        $query = "SELECT itemtype FROM `glpi_plugin_encryptfile_items` WHERE keys_id = $id";
+        if(!is_null($itemtype)) $query .= " AND itemtype = '$itemtype'";
+
+        $result = $DB->query($query);
+
+        $itemTypes = [];
+
+        if($result) foreach($result as $key => $values) {
+            $itemTypes[$values["itemtype"]] = $values["itemtype"];
+        }
+
+        return $itemTypes;
+    }
+        
+    /**
+     * getReadingProfiles
+     *
+     * @param  mixed $id
+     * @param  mixed $profiles_id
+     * @return void
+     */
+    function getReadingProfiles($id, $profiles_id = null) {
+        global $DB;
+
+        $query = "SELECT profiles_id FROM `glpi_plugin_encryptfile_profiles` WHERE keys_id = $id";
+        if(!is_null($profiles_id)) $query .= " AND profiles_id = $profiles_id";
+
+        $result = $DB->query($query);
+
+        $readingProfiles = [];
+
+        if($result) foreach($result as $key => $values) {
+            $readingProfiles[$values["profiles_id"]] = $values["profiles_id"];
+        }
+
+        return $readingProfiles;
+    }
+    
+    /**
+     * updateReadingProfiles
+     *
+     * @param  mixed $id
+     * @param  mixed $post
+     * @return void
+     */
+    public function updateReadingProfiles($id, $post) {
+        global $DB;
+
+        // Clean reading profiles before update
+        $this->removeReadingProfiles($id);
+
+        foreach($post as $profile_id) {
+            $query = "INSERT INTO `glpi_plugin_encryptfile_profiles`(keys_id, profiles_id) VALUES($id, $profile_id)";
+            $DB->query($query);
+        }
+    }
+    
+    /**
+     * updateItemtype
+     *
+     * @param  mixed $id
+     * @param  mixed $post
+     * @return void
+     */
+    public function updateItemtype($id, $post) {
+        global $DB;
+
+        // Clean itemtype before update
+        $this->removeItemtype($id);
+
+        foreach($post as $itemtype) {
+            $query = "INSERT INTO `glpi_plugin_encryptfile_items`(keys_id, itemtype) VALUES($id, $itemtype)";
+            $DB->query($query);
+        }
+    }
+    
+    /**
+     * removeItemtype
+     *
+     * @param  mixed $id
+     * @return void
+     */
+    function removeItemtype($id) {
+        global $DB;
+
+        $DB->query("DELETE FROM `glpi_plugin_encryptfile_items` WHERE keys_id = $id");
+    }
+    
+    /**
+     * removeReadingProfiles
+     *
+     * @param  mixed $id
+     * @return void
+     */
+    function removeReadingProfiles($id) {
+        global $DB;
+
+        $DB->query("DELETE FROM `glpi_plugin_encryptfile_profiles` WHERE keys_id = $id");
     }
 }
