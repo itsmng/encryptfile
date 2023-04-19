@@ -60,6 +60,17 @@ function plugin_encryptfile_install() {
         $DB->queryOrDie($query, "Create item table for Encrypted file plugin");
     }
 
+    if(!$DB->tableExists("glpi_plugin_encryptfile_documents")) {
+        $query = "CREATE TABLE `glpi_plugin_encryptfile_documents` (
+            `id` INT(11) NOT NULL AUTO_INCREMENT,
+            `keys_id` INT(11) NOT NULL DEFAULT 0,
+            `documents_id` INT(11) NOT NULL DEFAULT 0,
+            PRIMARY KEY (`id`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;";
+
+        $DB->queryOrDie($query, "Create item table for Encrypted file plugin");
+    }
+
     $migration->executeMigration();
     return true;
 }
@@ -75,10 +86,30 @@ function plugin_encryptfile_uninstall() {
     $queries = [
         "glpi_plugin_encryptfile_configs"   => "DROP TABLE IF EXISTS `glpi_plugin_encryptfile_configs`;",
         "glpi_plugin_encryptfile_profiles"  => "DROP TABLE IF EXISTS `glpi_plugin_encryptfile_profiles`;",
-        "glpi_plugin_encryptfile_items"     => "DROP TABLE IF EXISTS `glpi_plugin_encryptfile_items`;"
+        "glpi_plugin_encryptfile_items"     => "DROP TABLE IF EXISTS `glpi_plugin_encryptfile_items`;",
+        "glpi_plugin_encryptfile_documents" => "DROP TABLE IF EXISTS `glpi_plugin_encryptfile_documents`;"
     ];
 
     foreach($queries as $table => $query) $DB->queryOrDie($query, "Drop table ".$table);
 
     return true;
+}
+
+/**
+ * plugin_encryptfile_giveItem
+ *
+ * @param  mixed $itemtype
+ * @param  mixed $ID
+ * @param  mixed $data
+ * @param  mixed $num
+ * @return void
+ */
+function plugin_encryptfile_giveItem($itemtype, $ID, $data, $num) {
+    switch ($itemtype) {
+        case PluginEncryptfileConfig::class:
+            return PluginEncryptfileConfig::giveItem($itemtype, $ID, $data, $num);
+            break;
+    }
+ 
+    return "";
 }
