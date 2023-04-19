@@ -11,11 +11,12 @@
  */
 
 $(document).ready(function() {
-   /* $('a').each(function() {
-        console.log($(this).prop('href'));
+    $('a').each(function() {
         if ($(this).is('[href*="docid"')) {
-            alert("Contains questionmark");
+            var href = $(this).attr('href');
+            href = href.replace('front/document.send.php', 'plugins/encryptfile/front/document.send.php');
+            $(this).attr('href', href);
         }
-    });*/
+    });
 });
 
