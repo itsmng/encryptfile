@@ -167,16 +167,14 @@ class PluginEncryptfileEncrypt extends CommonDBTM {
 
         if(Session::haveRight("plugin_encryptfile_encrypt", READ)) {
             $PluginEncryptfileConfig = new PluginEncryptfileConfig();
-
             // Check if it is an encrypted file
             $secretKeyId = $PluginEncryptfileConfig->isEncrypted($documentId);
             
             if($secretKeyId) {
                 $secretKey = $PluginEncryptfileConfig->getSecretKey($_SESSION["glpiactiveprofile"]["id"], $secretKeyId);
-
-                // If secretKey empty, maybe it have only read right
+                // If secretKey empty, maybe the user have only read right
                 if(is_null($secretKey)) $secretKey = $PluginEncryptfileConfig->canRead($_SESSION["glpiactiveprofile"]["id"], $secretKeyId);
-    
+
                 if(!is_null($secretKey)) {
                     $file = PluginEncryptfileEncrypt::decryptFile(PluginEncryptfileEncrypt::decryptkey($secretKey), $filepath, $filename);
                 }
