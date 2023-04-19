@@ -28,6 +28,11 @@ function plugin_init_encryptfile() {
 	if(Session::haveRight("plugin_encryptfile_configs", READ)) {
         $PLUGIN_HOOKS['menu_toadd']['encryptfile'] = array('tools' => PluginEncryptfileConfig::class);
     }
+
+	$PLUGIN_HOOKS['pre_item_add']['encryptfile'] = array('Document' => array(PluginEncryptfileEncrypt::class, 'beforeAddDocument'));
+	$PLUGIN_HOOKS['item_add']['encryptfile'] = array('Document' => array(PluginEncryptfileEncrypt::class, 'afterAddDocument'));
+
+	$PLUGIN_HOOKS['add_javascript']['encryptfile'] = array('js/functions.js');
 }
 
 
