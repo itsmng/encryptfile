@@ -97,13 +97,17 @@ class PluginEncryptfileConfig extends CommonDBTM {
         $this->addStandardTab(__CLASS__, $ong, $options);
         return $ong;
     }
+
+    public static function giveItem($itemtype, $option_id, $data, $num) {
+        return '';
+    }
     
     /**
-     * getSearchOptions
+     * rawSearchOptions
      *
      * @return void
      */
-    public function getSearchOptionsNew() {
+    public function rawSearchOptions() {
         $tab = [];
 
         $tab[] = [
@@ -140,6 +144,7 @@ class PluginEncryptfileConfig extends CommonDBTM {
 
         return $tab;
     }
+
     
     /**
      * showForm
@@ -195,9 +200,9 @@ class PluginEncryptfileConfig extends CommonDBTM {
             'size'      => 3
         ];
         
-        echo "<tr class='tab_bg_1'><td>".__('Select reading profiles', 'encryptfile')."</td><td>";
+        echo "<tr class='tab_bg_1'><td width='50%'>".__('Select reading profiles', 'encryptfile')."</td><td>";
         Dropdown::showFromArray($dd_params['name'], $this->getProfiles(), $dd_params);
-        echo "</td>";
+        echo "</td></tr>";
 
         $this->showFormButtons(['candel' => false]);
     
@@ -229,9 +234,9 @@ class PluginEncryptfileConfig extends CommonDBTM {
             'size'      => 3
         ];
         
-        echo "<tr class='tab_bg_1'><td>".__('Select GLPi object', 'encryptfile')."</td><td>";
+        echo "<tr class='tab_bg_2'><td width='50%'>".__('Select GLPi object', 'encryptfile')."</td><td>";
         Dropdown::showFromArray($dd_params['name'], $glpiObjects, $dd_params);
-        echo "</td>";
+        echo "</td></tr>";
 
         $this->showFormButtons(['candel' => false]);
     
@@ -364,5 +369,112 @@ class PluginEncryptfileConfig extends CommonDBTM {
         global $DB;
 
         $DB->query("DELETE FROM `glpi_plugin_encryptfile_profiles` WHERE keys_id = $id");
+    }
+    
+    /**
+     * getSecretKey
+     *
+     * @param  mixed $activeProfile
+     * @return void
+     */
+    public function getSecretKey($activeProfile, $secretKeyId = null) {
+        $secretKey = null;
+
+        if(!is_null($secretKeyId)) {
+            $search = ["profiles_id" => $activeProfile, "id" => $secretKeyId];
+        } else {
+            $search = ["profiles_id" => $activeProfile];
+        }
+
+        $result = $this->find($search);
+        if($result) foreach($result as $values) {
+            // Only if key is actived
+            if($values["status"]) {
+                $secretKey = $values["key"];
+            }
+        }
+
+        return $secretKey;
+    }
+    
+    /**
+     * getSecretKeyId
+     *
+     * @param  mixed $activeProfile
+     * @return void
+     */
+    public function getSecretKeyId($activeProfile) {
+        $secretKeyId = null;
+
+        $result = $this->find(["profiles_id" => $activeProfile]);
+        if($result) foreach($result as $values) {
+            // Only if key is actived
+            if($values["status"]) {
+                $secretKeyId = $values["id"];
+            }
+        }
+
+        return $secretKeyId;
+    }
+    
+    /**
+     * saveDocumentInfo
+     *
+     * @param  mixed $secretKeyId
+     * @param  mixed $documentId
+     * @return void
+     */
+    public function saveDocumentInfo($secretKeyId, $documentId) {
+        global $DB;
+
+        $query = "INSERT INTO `glpi_plugin_encryptfile_documents`(keys_id, documents_id) VALUES($secretKeyId, $documentId)";
+        $DB->query($query);
+
+        return true;
+    }
+    
+    /**
+     * canRead
+     *
+     * @param  mixed $activeProfile
+     * @param  mixed $secretKeyId
+     * @return void
+     */
+    public function canRead($activeProfile, $secretKeyId) {
+        global $DB;
+        
+        $secretKey = null;
+
+        $query = "SELECT c.key, c.status FROM `glpi_plugin_encryptfile_configs` c LEFT JOIN `glpi_plugin_encryptfile_profiles` p on c.id = p.keys_id WHERE p.profiles_id = $activeProfile AND p.keys_id = $secretKeyId";
+        $result = $DB->query($query);
+
+        if($result) foreach($result as $values) {
+            if($values["status"]) {
+                $secretKey = $values["key"];
+            }
+        }
+
+        return $secretKey;
+    }
+    
+    /**
+     * isEncrypted
+     *
+     * @param  mixed $documentId
+     * @return void
+     */
+    public function isEncrypted($documentId) {
+        global $DB;
+
+        $secretKeyId = null;
+
+        $query = "SELECT keys_id FROM `glpi_plugin_encryptfile_documents` WHERE documents_id = $documentId";
+        $result = $DB->query($query);
+
+        if($result) foreach($result as $values) {
+            $secretKeyId = $values["keys_id"];
+        }
+
+        return $secretKeyId;
     }
 }
