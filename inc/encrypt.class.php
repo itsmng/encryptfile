@@ -90,9 +90,9 @@ class PluginEncryptfileEncrypt extends CommonDBTM {
      * @param  mixed $filepath
      * @return void
      */
-    static private function decryptFile($secretKey, $filepath) {
+    static private function decryptFile($secretKey, $filepath, $filename) {
         $encryptedFile = $filepath;
-        $decryptedFile = GLPI_TMP_DIR.'/example.dec';
+        $decryptedFile = GLPI_TMP_DIR.'/'.$filename;
         $chunkSize = 4096;
 
         $fdIn = fopen($encryptedFile, 'rb');
@@ -117,8 +117,7 @@ class PluginEncryptfileEncrypt extends CommonDBTM {
         if (!$ok) {
             die('Invalid/corrupted input');
         } else {
-            rename($decryptedFile, $encryptedFile);
-            return true;
+            return $decryptedFile;
         }
     }
     
@@ -163,7 +162,9 @@ class PluginEncryptfileEncrypt extends CommonDBTM {
      * @param  mixed $filepath
      * @return void
      */
-    static function beforeDownloadDocument($documentId, $filepath) {
+    static function beforeDownloadDocument($documentId, $filepath, $filename) {
+        $file = $filepath;
+
         if(Session::haveRight("plugin_encryptfile_encrypt", READ)) {
             $PluginEncryptfileConfig = new PluginEncryptfileConfig();
 
@@ -177,9 +178,11 @@ class PluginEncryptfileEncrypt extends CommonDBTM {
                 if(is_null($secretKey)) $secretKey = $PluginEncryptfileConfig->canRead($_SESSION["glpiactiveprofile"]["id"], $secretKeyId);
     
                 if(!is_null($secretKey)) {
-                    PluginEncryptfileEncrypt::decryptFile(PluginEncryptfileEncrypt::decryptkey($secretKey), $filepath);
+                    $file = PluginEncryptfileEncrypt::decryptFile(PluginEncryptfileEncrypt::decryptkey($secretKey), $filepath, $filename);
                 }
             }
         }
+
+        return $file;
     }
 } 
