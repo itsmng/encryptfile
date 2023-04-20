@@ -31,6 +31,7 @@ function plugin_init_encryptfile() {
 
 	$PLUGIN_HOOKS['pre_item_add']['encryptfile'] = array('Document' => array(PluginEncryptfileEncrypt::class, 'beforeAddDocument'));
 	$PLUGIN_HOOKS['item_add']['encryptfile'] = array('Document' => array(PluginEncryptfileEncrypt::class, 'afterAddDocument'));
+	$PLUGIN_HOOKS['item_purge']['encryptfile'] = array('Document' => array(PluginEncryptfileConfig::class, 'afterPurgeDocument'));
 
 	// Load js only if read right checked
 	if(Session::haveRight("plugin_encryptfile_encrypt", READ)) {

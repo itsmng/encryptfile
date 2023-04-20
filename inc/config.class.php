@@ -498,4 +498,17 @@ class PluginEncryptfileConfig extends CommonDBTM {
 
         return $itemtypes;
     }
+    
+    /**
+     * afterPurgeDocument
+     *
+     * @param  mixed $post
+     * @return void
+     */
+    static function afterPurgeDocument(Document $post) {
+        global $DB;
+
+        $query = "DELETE FROM `glpi_plugin_encryptfile_documents` WHERE documents_id = ".$post->fields["id"];
+        $DB->query($query);
+    }
 }
