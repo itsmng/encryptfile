@@ -51,7 +51,7 @@ function plugin_init_encryptfile() {
  **/
 function plugin_version_encryptfile() {
 	return [
-		'name'         => "Encrypted file",
+		'name'         => __("Encrypted file", "encryptfile"),
 		'version'      => PLUGIN_ENCRYPTFILE_VERSION,
 		'author'       => 'Charlène AUGER',
 		'license'      => 'GPLv2+',
