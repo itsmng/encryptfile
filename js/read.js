@@ -13,7 +13,7 @@
 $(document).ajaxStop(function() {
     setTimeout(function() {
         $('a').each(function() {
-            if ($(this).is('[href*="docid"')) {
+            if ($(this).is('[href*="docid"') && !$(this).is('[href*="encryptfile"')) {
                 var href = $(this).attr('href');
                 href = href.replace('front/document.send.php', 'plugins/encryptfile/front/document.send.php');
                 $(this).attr('href', href);
