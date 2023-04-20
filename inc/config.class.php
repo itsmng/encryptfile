@@ -219,11 +219,19 @@ class PluginEncryptfileConfig extends CommonDBTM {
 
         $this->showFormHeader(["formtitle" => __("Item configuration", "encryptfile")]);
         
-        $glpiObjects = [Ticket::class => Ticket::getTypeName()];
+        $glpiObjects = [
+            Ticket::class => Ticket::getTypeName(),
+            Document::class => Document::getTypeName()
+        ];
 
         foreach(get_declared_classes() as $class){
             if(Document::canApplyOn($class)) $glpiObjects[$class] = $class::getTypeName();
         }
+
+        uasort($glpiObjects, function ($a, $b) {
+                return strcmp($a,$b);
+            }
+        );
 
         $dd_params = [
             'name'      => 'itemtype',
