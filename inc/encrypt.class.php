@@ -129,11 +129,13 @@ class PluginEncryptfileEncrypt extends CommonDBTM {
      */
     static function beforeAddDocument(Document $post) {
         if(Session::haveRight("plugin_encryptfile_encrypt", UPDATE)) {
-            $PluginEncryptfileConfig = new PluginEncryptfileConfig();
-            $secretKey = $PluginEncryptfileConfig->getSecretKey($_SESSION["glpiactiveprofile"]["id"]);
-
-            if(!is_null($secretKey)) {
-                PluginEncryptfileEncrypt::encryptFile(PluginEncryptfileEncrypt::decryptkey($secretKey), $post->input["_filename"][0]);
+            if(isset($post->input["encryptfile"]) && $post->input["encryptfile"] == 1) {
+                $PluginEncryptfileConfig = new PluginEncryptfileConfig();
+                $secretKey = $PluginEncryptfileConfig->getSecretKey($_SESSION["glpiactiveprofile"]["id"]);
+    
+                if(!is_null($secretKey)) {
+                    PluginEncryptfileEncrypt::encryptFile(PluginEncryptfileEncrypt::decryptkey($secretKey), $post->input["_filename"][0]);
+                }
             }
         }
     }
@@ -146,11 +148,13 @@ class PluginEncryptfileEncrypt extends CommonDBTM {
      */
     static function afterAddDocument(Document $post) {
         if(Session::haveRight("plugin_encryptfile_encrypt", UPDATE)) {
-            $PluginEncryptfileConfig = new PluginEncryptfileConfig();
-            $secretKeyId = $PluginEncryptfileConfig->getSecretKeyId($_SESSION["glpiactiveprofile"]["id"]);
+            if(isset($post->input["encryptfile"]) && $post->input["encryptfile"] == 1) {
+                $PluginEncryptfileConfig = new PluginEncryptfileConfig();
+                $secretKeyId = $PluginEncryptfileConfig->getSecretKeyId($_SESSION["glpiactiveprofile"]["id"]);
 
-            if(!is_null($secretKeyId)) {
-                $PluginEncryptfileConfig->saveDocumentInfo($secretKeyId, $post->fields["id"]);
+                if(!is_null($secretKeyId)) {
+                    $PluginEncryptfileConfig->saveDocumentInfo($secretKeyId, $post->fields["id"]);
+                }
             }
         }
     }
