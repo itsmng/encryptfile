@@ -32,7 +32,16 @@ function plugin_init_encryptfile() {
 	$PLUGIN_HOOKS['pre_item_add']['encryptfile'] = array('Document' => array(PluginEncryptfileEncrypt::class, 'beforeAddDocument'));
 	$PLUGIN_HOOKS['item_add']['encryptfile'] = array('Document' => array(PluginEncryptfileEncrypt::class, 'afterAddDocument'));
 
-	$PLUGIN_HOOKS['add_javascript']['encryptfile'] = array('js/functions.js');
+	// Load js only if read right checked
+	if(Session::haveRight("plugin_encryptfile_encrypt", READ)) {
+		$PLUGIN_HOOKS['add_javascript']['encryptfile'][] = 'js/read.js';
+	}
+
+	$PluginEncryptfileConfig = new PluginEncryptfileConfig();
+	// Load js only if write right checked and have a configured key
+	if(Session::haveRight("plugin_encryptfile_encrypt", UPDATE) && !is_null($PluginEncryptfileConfig->getSecretKey($_SESSION["glpiactiveprofile"]["id"]))) {
+		$PLUGIN_HOOKS['add_javascript']['encryptfile'][] = 'js/write.js';
+	}
 }
 
 
