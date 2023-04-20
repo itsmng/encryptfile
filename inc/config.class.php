@@ -477,4 +477,25 @@ class PluginEncryptfileConfig extends CommonDBTM {
 
         return $secretKeyId;
     }
+    
+    /**
+     * getAuthorizedItem
+     *
+     * @param  mixed $secretKeyId
+     * @return void
+     */
+    public function getAuthorizedItem($secretKeyId) {
+        global $DB;
+
+        $itemtypes = [];
+
+        $query = "SELECT itemtype FROM `glpi_plugin_encryptfile_items` WHERE keys_id = $secretKeyId";
+        $result = $DB->query($query);
+
+        if($result) foreach($result as $values) {
+            $itemtypes[] = strtolower($values["itemtype"]).".form.php";
+        }
+
+        return $itemtypes;
+    }
 }
