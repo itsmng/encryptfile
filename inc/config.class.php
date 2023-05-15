@@ -501,7 +501,7 @@ class PluginEncryptfileConfig extends CommonDBTM {
         $result = $DB->query($query);
 
         if($result) foreach($result as $values) {
-            $itemtypes[] = strtolower($values["itemtype"]).".form.php";
+            $itemtypes[] = $values["itemtype"]::getFormURL();
         }
 
         return $itemtypes;
