@@ -13,7 +13,7 @@
 $(document).ajaxStop(function() {
     setTimeout(function() {
         $('form').each(function() {
-            if ($(this).is('[action*="front/document.form.php"') && $('#encryptfile').length == 0) {
+            if (($(this).is('[action*="front/document.form.php"') || $(this).find('#fileupload_info_ticket').length == 1) && $('#encryptfile').length == 0) {
                 addEncryptedFileCheckbox($(this));
             }
         });
@@ -33,6 +33,7 @@ function addEncryptedFileCheckbox(form) {
         },
         success : function(data){
             var input = form.find('input[name="add"]');
+            if(input.length == 0) input = form.find('button[name="add"]');
             $(data).insertBefore(input[0]);
         },
         error : function () {
