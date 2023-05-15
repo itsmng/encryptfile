@@ -148,7 +148,7 @@ class PluginEncryptfileEncrypt extends CommonDBTM {
      */
     static function afterAddDocument(Document $post) {
         if(Session::haveRight("plugin_encryptfile_encrypt", UPDATE)) {
-            if(isset($post->input["encryptfile"]) && $post->input["encryptfile"] == 1) {
+            if((isset($post->input["encryptfile"]) && $post->input["encryptfile"] == 1) || (isset($_SESSION["encryptfile"]["ticket"]["use_encrypt"]) && $_SESSION["encryptfile"]["ticket"]["use_encrypt"] == 1)) {
                 $PluginEncryptfileConfig = new PluginEncryptfileConfig();
                 $secretKeyId = $PluginEncryptfileConfig->getSecretKeyId($_SESSION["glpiactiveprofile"]["id"]);
 
@@ -186,5 +186,31 @@ class PluginEncryptfileEncrypt extends CommonDBTM {
         }
 
         return $file;
+    }
+    
+    /**
+     * beforeAddTicket
+     *
+     * @param  mixed $post
+     * @return void
+     */
+    static function beforeAddTicket(Ticket $post) {
+        if(Session::haveRight("plugin_encryptfile_encrypt", UPDATE)) {
+            if(isset($post->input["encryptfile"]) && $post->input["encryptfile"] == 1) {
+                $PluginEncryptfileConfig = new PluginEncryptfileConfig();
+                $secretKey = $PluginEncryptfileConfig->getSecretKey($_SESSION["glpiactiveprofile"]["id"]);
+    
+                if(!is_null($secretKey)) {
+                    PluginEncryptfileEncrypt::encryptFile(PluginEncryptfileEncrypt::decryptkey($secretKey), $post->input["_filename"][0]);
+                    $_SESSION["encryptfile"]["ticket"]["use_encrypt"] = 1;
+                } else {
+                    $_SESSION["encryptfile"]["ticket"]["use_encrypt"] = 0;
+                }
+            } else {
+                $_SESSION["encryptfile"]["ticket"]["use_encrypt"] = 0;
+            }
+        } else {
+            $_SESSION["encryptfile"]["ticket"]["use_encrypt"] = 0;
+        }
     }
 } 
