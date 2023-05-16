@@ -42,3 +42,6 @@ msgstr "Select the profiles with decryption rights"
 
 msgid "Select GLPi object"
 msgstr "Select objects requiring document encryption"
+
+msgid "Formcreator configuration"
+msgstr ""

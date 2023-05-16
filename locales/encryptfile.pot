@@ -47,3 +47,6 @@ msgstr ""
 
 msgid "Select GLPi object"
 msgstr ""
+
+msgid "Formcreator configuration"
+msgstr ""

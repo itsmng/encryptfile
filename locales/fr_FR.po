@@ -42,3 +42,6 @@ msgstr "Sélectionnez les profils ayant droit de déchiffrage"
 
 msgid "Select GLPi object"
 msgstr "Sélectionnez les objets nécessitant le chiffrage de document"
+
+msgid "Formcreator configuration"
+msgstr "Gestion de Formcreator"
