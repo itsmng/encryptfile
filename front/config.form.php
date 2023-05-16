@@ -42,6 +42,8 @@ if (isset($_POST["add"])) {
 		$pluginEncryptfileConfigs->updateReadingProfiles($_POST["id"], $_POST["profiles_id_reading"]);
 	} elseif(isset($_POST["itemtype"])) {
 		$pluginEncryptfileConfigs->updateItemtype($_POST["id"], $_POST["itemtype"]);
+	} elseif(isset($_POST["forms_id"])) {
+		$pluginEncryptfileConfigs->updateFormcreator($_POST["id"], $_POST["forms_id"], $_POST["sections_id"], $_POST["questions_id"]);
 	} else {
 		$pluginEncryptfileConfigs->update($_POST);
 	}

@@ -54,6 +54,9 @@ class PluginEncryptfileConfig extends CommonDBTM {
                 case __CLASS__ :
                     $tab[1] = __("Profile configuration", "encryptfile");
                     $tab[2] = __("Item configuration", "encryptfile");
+                    if ((new Plugin())->isActivated('formcreator')) {
+                        $tab[3] = __("Formcreator configuration", "encryptfile");
+                    }
                     return $tab;
             }
         }
@@ -78,6 +81,8 @@ class PluginEncryptfileConfig extends CommonDBTM {
                     case 2 :
                         $item->showItemForm();
                         break;
+                    case 3 :
+                        $item->showFormcreatorForm();
                 }
 
                 break;
@@ -107,43 +112,36 @@ class PluginEncryptfileConfig extends CommonDBTM {
      *
      * @return void
      */
-    public function rawSearchOptions() {
+    function rawSearchOptions() {
         $tab = [];
-
+  
         $tab[] = [
-            'id'            => 'common',
-            'name'          => __('Characteristics')
+           'id'                 => 'common',
+           'name'               => __('Characteristics')
         ];
-
+  
         $tab[] = [
-            'id'            => '1',
-            'table'         => self::getTable(),
-            'field'         => 'name',
-            'name'          => __('Name'),
-            'datatype'      => 'itemlink',
-            'massiveaction' => false
+           'id'                 => '1',
+           'table'              => $this->getTable(),
+           'field'              => 'name',
+           'name'               => __('Title'),
+           'searchtype'         => 'contains',
+           'datatype'           => 'itemlink',
+           'massiveaction'      => false,
+           'autocomplete'       => true,
         ];
-
+  
         $tab[] = [
-            'id'            => '2',
-            'table'         => self::getTable(),
-            'field'         => 'comment',
-            'name'          => __('Comment'),
-            'datatype'      => 'text',
-            'massiveaction' => false
+           'id'                 => '16',
+           'table'              => $this->getTable(),
+           'field'              => 'comment',
+           'name'               => __('Comments'),
+           'datatype'           => 'text'
         ];
-
-        $tab[] = [
-            'id'            => '3',
-            'table'         => self::getTable(),
-            'field'         => 'status',
-            'name'          => __('Active'),
-            'datatype'      => 'bool',
-            'massiveaction' => false
-        ];
-
+  
         return $tab;
     }
+
 
     
     /**
@@ -173,7 +171,7 @@ class PluginEncryptfileConfig extends CommonDBTM {
         echo "</td></tr>";
 
         echo "<tr class='tab_bg_1'><td>".__('Active')."</td><td>";
-        Dropdown::ShowFromArray("status", array(0 => __("No"), 1 => __("Yes")), array('value' => $this->fields["status"]));
+        Dropdown::showFromArray("status", array(0 => __("No"), 1 => __("Yes")), array('value' => $this->fields["status"]));
         echo "</td></tr>";
 
         $this->showFormButtons($options);
@@ -247,6 +245,44 @@ class PluginEncryptfileConfig extends CommonDBTM {
         echo "</td></tr>";
 
         $this->showFormButtons(['candel' => false]);
+    
+        return true;
+    }
+    
+    /**
+     * showFormcreatorForm
+     *
+     * @return void
+     */
+    function showFormcreatorForm() {
+        $rand = mt_rand();
+
+        $this->showFormHeader(["formtitle" => __("Formcreator configuration", "encryptfile"), "colspan" => 3]);
+
+        $PluginFormcreatorForm = new PluginFormcreatorForm();
+        $formsForm = $PluginFormcreatorForm->find();
+
+        $forms = [
+            "0" => "-----"
+        ];
+
+        foreach($formsForm as $key => $value) $forms[$key] = $value["name"];
+
+        echo "<tr class='tab_bg_1'>";
+        echo "<td>".__('Form', 'formcreator')."</td><td>";
+        Dropdown::showFromArray("forms_id", $forms, array("on_change" => "displayFormSection();"));
+        echo "</td>";
+
+        echo "<td>".__('Section', 'formcreator')."</td><td id='sections_to_replace'>";
+        Dropdown::showFromArray("sections_id", array("0" => "-----"), array());
+        echo "</td>";
+
+        echo "<td>".__('Question', 'formcreator')."</td><td id='questions_to_replace'>";
+        Dropdown::showFromArray("questions_id", array("0" => "-----"), array());
+        echo "</td>";
+        echo "</tr>";
+
+        $this->showFormButtons(['candel' => false, "colspan" => 3]);
     
         return true;
     }
@@ -353,6 +389,22 @@ class PluginEncryptfileConfig extends CommonDBTM {
             $query = "INSERT INTO `glpi_plugin_encryptfile_items`(keys_id, itemtype) VALUES($id, '$itemtype')";
             $DB->query($query);
         }
+    }
+    
+    /**
+     * updateFormcreator
+     *
+     * @param  mixed $id
+     * @param  mixed $form_id
+     * @param  mixed $sections_id
+     * @param  mixed $questions_id
+     * @return void
+     */
+    public function updateFormcreator($id, $form_id, $sections_id, $questions_id) {
+        global $DB;
+
+        $query = "INSERT INTO `glpi_plugin_encryptfile_formcreator`(keys_id,forms_id,sections_id,questions_id) VALUES($id,$form_id,$sections_id,$questions_id)";
+        $DB->query($query);
     }
     
     /**
