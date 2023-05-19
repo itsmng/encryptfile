@@ -283,7 +283,109 @@ class PluginEncryptfileConfig extends CommonDBTM {
         echo "</tr>";
 
         $this->showFormButtons(['candel' => false, "colspan" => 3]);
+
+        $this->showFormcreatorConfigTable($_GET["id"]);
     
+        return true;
+    }
+    
+    /**
+     * showFormcreatorConfigTable
+     *
+     * @param  mixed $id
+     * @return void
+     */
+    function showFormcreatorConfigTable($id) {
+        global $DB;
+
+        $canedit = false;
+
+        if(Session::haveRight("plugin_encryptfile_configs", UPDATE)) {
+            $canedit = true;
+        }
+
+        $query = "SELECT * FROM `glpi_plugin_encryptfile_formcreator` WHERE keys_id = $id";
+        $result = $DB->query($query);
+
+        $configuredForms = [];
+
+        $PluginFormcreatorForm = new PluginFormcreatorForm();
+        $PluginFormcreatorSection = new PluginFormcreatorSection();
+        $PluginFormcreatorQuestion = new PluginFormcreatorQuestion();
+
+        if($result) foreach($result as $key => $values) {
+            $form = $PluginFormcreatorForm->find(["id" => $values["forms_id"]]);
+            $configuredForms[$values["id"]]["form"] = $form[$values["forms_id"]]["name"];
+            $section = $PluginFormcreatorSection->find(["id" => $values["sections_id"]]);
+            $configuredForms[$values["id"]]["section"] = $section[$values["sections_id"]]["name"];
+            $question = $PluginFormcreatorQuestion->find(["id" => $values["questions_id"]]);
+            $configuredForms[$values["id"]]["question"] = $question[$values["questions_id"]]["name"];
+        }
+
+        echo "<div class='spaced'>";
+        echo "<table class='tab_cadre_fixehov'>";
+        // Table header
+        echo "<tr class='noHover'><th colspan='8'>".sprintf(__('Associated forms', 'encryptfile'));
+        echo "</th></tr>";
+
+        // Fields header
+        echo "<tr class='tab_bg_1'>";
+        echo "<th>" . __("Form", "formcreator") . "</th>";
+        echo "<th>" . __("Section", "formcreator") . "</th>";
+        echo "<th>" . __("Question", "formcreator") . "</th>";
+        if($canedit) echo "<th>" . __("Action") . "</th>";
+        echo "</tr>";
+
+        if(!empty($configuredForms)) {
+            foreach($configuredForms as $configId => $forms) {
+                echo "<tr>";
+                echo "<td>".$forms["form"]."</td>";
+                echo "<td>".$forms["section"]."</td>";
+                echo "<td>".$forms["question"]."</td>";
+                if($canedit) echo "<td><a href=".$_SESSION['glpiroot']."/plugins/encryptfile/front/config.form.php?removeid=".$configId.">".__("Delete")."</a>";
+                echo "</tr>";
+            }
+        } else {
+            echo "<tr><td colspan='8'>".__("No associated form", "encryptfile")."</td></tr>";
+        }
+
+        echo "</table></div>";
+    }
+    
+    /**
+     * removeFormConfig
+     *
+     * @param  mixed $id
+     * @return void
+     */
+    function removeFormConfig($id) {
+        global $DB;
+
+        $query = "DELETE FROM `glpi_plugin_encryptfile_formcreator` WHERE id = $id";
+        $DB->query($query);
+
+        return true;
+    }
+    
+    /**
+     * removeAssociatedConfig
+     *
+     * @param  mixed $key_id
+     * @return void
+     */
+    function removeAssociatedConfig($key_id) {
+        global $DB;
+
+        $queries = [
+            "DELETE FROM `glpi_plugin_encryptfile_items` WHERE keys_id = $key_id",
+            "DELETE FROM `glpi_plugin_encryptfile_documents` WHERE keys_id = $key_id",
+            "DELETE FROM `glpi_plugin_encryptfile_formcreator` WHERE keys_id = $key_id",
+        ];
+
+        foreach($queries as $query) {
+            $DB->query($query);
+        }
+
         return true;
     }
     
@@ -570,5 +672,27 @@ class PluginEncryptfileConfig extends CommonDBTM {
 
         $query = "DELETE FROM `glpi_plugin_encryptfile_documents` WHERE documents_id = ".$post->fields["id"];
         $DB->query($query);
+    }
+    
+    /**
+     * getFormConfig
+     *
+     * @param  mixed $key_id
+     * @param  mixed $form_id
+     * @return void
+     */
+    function getFormConfig($key_id, $form_id) {
+        global $DB;
+
+        $query = "SELECT questions_id FROM `glpi_plugin_encryptfile_formcreator` WHERE keys_id = $key_id AND forms_id = $form_id";
+        $result = $DB->query($query);
+
+        $question = null;
+
+        if($result) foreach($result as $values) {
+            $question = $values["questions_id"];
+        }
+
+        return $question;
     }
 }

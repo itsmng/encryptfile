@@ -35,6 +35,7 @@ if (isset($_POST["add"])) {
 } else if (isset($_POST["purge"])) {
 	$pluginEncryptfileConfigs->check($_POST["id"], PURGE);
 	$pluginEncryptfileConfigs->delete($_POST, 1);
+	$pluginEncryptfileConfigs->removeAssociatedConfig($_POST["id"]);
 	$pluginEncryptfileConfigs->redirectToList();
 } else if (isset($_POST["update"])) {
 	$pluginEncryptfileConfigs->check($_POST["id"], UPDATE);
@@ -48,6 +49,9 @@ if (isset($_POST["add"])) {
 		$pluginEncryptfileConfigs->update($_POST);
 	}
 	
+	Html::back();
+} elseif(isset($_GET["removeid"])) {
+	$pluginEncryptfileConfigs->removeFormConfig($_GET["removeid"]);
 	Html::back();
 } else {
 	Html::header(PluginEncryptfileConfig::getTypeName(2), $_SERVER['PHP_SELF'], "tools", "PluginEncryptfileConfig");
