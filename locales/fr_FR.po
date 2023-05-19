@@ -26,6 +26,9 @@ msgstr "Chiffrer le document"
 msgid "Encrypted file"
 msgstr "Chiffrage de document"
 
+msgid "Encrypted files"
+msgstr "Chiffrage de documents"
+
 msgid "Generate key"
 msgid_plural "Generate keys"
 msgstr[0] "Gestion de la clé de chiffrage"
