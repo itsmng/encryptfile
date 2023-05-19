@@ -45,3 +45,9 @@ msgstr "Select objects requiring document encryption"
 
 msgid "Formcreator configuration"
 msgstr ""
+
+msgid "Associated forms"
+msgstr ""
+
+msgid "No associated form"
+msgstr ""

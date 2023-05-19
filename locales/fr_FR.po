@@ -45,3 +45,9 @@ msgstr "Sélectionnez les objets nécessitant le chiffrage de document"
 
 msgid "Formcreator configuration"
 msgstr "Gestion de Formcreator"
+
+msgid "Associated forms"
+msgstr "Formulaires associés"
+
+msgid "No associated form"
+msgstr "Aucun formulaire associé"
