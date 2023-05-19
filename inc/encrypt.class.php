@@ -140,7 +140,9 @@ class PluginEncryptfileEncrypt extends CommonDBTM {
                 $secretKey = $PluginEncryptfileConfig->getSecretKey($_SESSION["glpiactiveprofile"]["id"]);
     
                 if(!is_null($secretKey)) {
-                    PluginEncryptfileEncrypt::encryptFile(PluginEncryptfileEncrypt::decryptkey($secretKey), $post->input["_filename"][0]);
+                    foreach($post->input["_filename"] as $filename) {
+                        PluginEncryptfileEncrypt::encryptFile(PluginEncryptfileEncrypt::decryptkey($secretKey), $filename);
+                    }
                 }
             }
         }
@@ -209,8 +211,11 @@ class PluginEncryptfileEncrypt extends CommonDBTM {
                 $secretKey = $PluginEncryptfileConfig->getSecretKey($_SESSION["glpiactiveprofile"]["id"]);
     
                 if(!is_null($secretKey)) {
-                    PluginEncryptfileEncrypt::encryptFile(PluginEncryptfileEncrypt::decryptkey($secretKey), $post->input["_filename"][0]);
-                    $_SESSION["encryptfile"]["ticket"]["use_encrypt"] = 1;
+                    foreach($post->input["_filename"] as $filename) {
+                        PluginEncryptfileEncrypt::encryptFile(PluginEncryptfileEncrypt::decryptkey($secretKey), $filename);
+                        $_SESSION["encryptfile"]["ticket"]["use_encrypt"] = 1;
+                    }
+                    
                     return true;
                 }
             }
