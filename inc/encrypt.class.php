@@ -90,7 +90,7 @@ class PluginEncryptfileEncrypt extends CommonDBTM {
      * @param  mixed $filepath
      * @return void
      */
-    static private function decryptFile($secretKey, $filepath, $filename) {
+    static private function decryptFile($secretKey, $filepath, $filename, $purge = false) {
         $encryptedFile = $filepath;
         $decryptedFile = GLPI_TMP_DIR.'/'.$filename;
         $chunkSize = 4096;
@@ -117,7 +117,12 @@ class PluginEncryptfileEncrypt extends CommonDBTM {
         if (!$ok) {
             die('Invalid/corrupted input');
         } else {
-            return $decryptedFile;
+            if($purge) {
+                rename($decryptedFile, $encryptedFile);
+                return $encryptedFile;
+            } else {
+                return $decryptedFile;
+            }
         }
     }
     
@@ -242,5 +247,24 @@ class PluginEncryptfileEncrypt extends CommonDBTM {
 
         $_SESSION["encryptfile"]["formcreator"]["use_encrypt"] = 0;
         return true;
+    }
+    
+    /**
+     * decryptAllAssociatedDocuments
+     *
+     * @param  mixed $secretKeyId
+     * @return void
+     */
+    function decryptAllAssociatedDocuments($secretKeyId) {
+        $PluginEncryptfileConfig = new PluginEncryptfileConfig();
+        $associatedDocuments = $PluginEncryptfileConfig->getAllAssociatedDocument($secretKeyId);
+        $secretKey = $PluginEncryptfileConfig->getSecretKey($_SESSION["glpiactiveprofile"]["id"], $secretKeyId, true);
+
+        if(!empty($associatedDocuments)) foreach($associatedDocuments as $documentId => $associatedDocument) {
+            $decryptFile = PluginEncryptfileEncrypt::decryptFile(PluginEncryptfileEncrypt::decryptkey($secretKey), GLPI_VAR_DIR."/".$associatedDocument["filepath"], $associatedDocument["filename"], true);
+            $Document = new Document();
+            $newDocumentSum = sha1_file($decryptFile);
+            $Document->update(["id" => $documentId, "sha1sum" => $newDocumentSum]);
+        }
     }
 } 

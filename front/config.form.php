@@ -34,6 +34,7 @@ if (isset($_POST["add"])) {
 	Html::redirect($CFG_GLPI["root_doc"] . "/plugins/encryptfile/front/config.php");
 } else if (isset($_POST["purge"])) {
 	$pluginEncryptfileConfigs->check($_POST["id"], PURGE);
+	$pluginEncryptfileEncrypt->decryptAllAssociatedDocuments($_POST["id"]);
 	$pluginEncryptfileConfigs->delete($_POST, 1);
 	$pluginEncryptfileConfigs->removeAssociatedConfig($_POST["id"]);
 	$pluginEncryptfileConfigs->redirectToList();

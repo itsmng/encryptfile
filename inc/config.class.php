@@ -175,6 +175,10 @@ class PluginEncryptfileConfig extends CommonDBTM {
         echo "</td></tr>";
 
         $this->showFormButtons($options);
+
+        if(Session::haveRight("plugin_encryptfile_configs", PURGE)) {
+            echo __("Please note that purging the key decrypts all the documents associated with this key.", "encryptfile");
+        }
     
         return true;
     }
@@ -539,7 +543,7 @@ class PluginEncryptfileConfig extends CommonDBTM {
      * @param  mixed $activeProfile
      * @return void
      */
-    public function getSecretKey($activeProfile, $secretKeyId = null) {
+    public function getSecretKey($activeProfile, $secretKeyId = null, $purge = false) {
         $secretKey = null;
 
         if(!is_null($secretKeyId)) {
@@ -550,8 +554,8 @@ class PluginEncryptfileConfig extends CommonDBTM {
 
         $result = $this->find($search);
         if($result) foreach($result as $values) {
-            // Only if key is actived
-            if($values["status"]) {
+            // Only if key is actived OR if purge 
+            if($values["status"] || $purge) {
                 $secretKey = $values["key"];
             }
         }
@@ -672,6 +676,28 @@ class PluginEncryptfileConfig extends CommonDBTM {
 
         $query = "DELETE FROM `glpi_plugin_encryptfile_documents` WHERE documents_id = ".$post->fields["id"];
         $DB->query($query);
+    }
+
+    function getAllAssociatedDocument($secretKeyId) {
+        global $DB;
+
+        $query = "SELECT documents_id FROM `glpi_plugin_encryptfile_documents` WHERE keys_id = $secretKeyId";
+        $result = $DB->query($query);
+
+        $Document = new Document();
+
+        $associatedDocuments = [];
+
+        if($result) foreach($result as $associatedDocument) {
+            $document = $Document->find(["id" => $associatedDocument["documents_id"]]);
+
+            if($document) foreach($document as $documentInformation) {
+                $associatedDocuments[$documentInformation["id"]]["filepath"] = $documentInformation["filepath"];
+                $associatedDocuments[$documentInformation["id"]]["filename"] = $documentInformation["filename"];
+            }
+        } 
+
+        return $associatedDocuments;
     }
     
     /**
