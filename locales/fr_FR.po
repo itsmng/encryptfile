@@ -51,3 +51,6 @@ msgstr "Formulaires associés"
 
 msgid "No associated form"
 msgstr "Aucun formulaire associé"
+
+msgid "Please note that purging the key decrypts all the documents associated with this key."
+msgstr "Veuillez noter que la purge de la clé décrypte tous les documents associés à cette clé."

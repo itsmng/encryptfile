@@ -51,3 +51,6 @@ msgstr ""
 
 msgid "No associated form"
 msgstr ""
+
+msgid "Please note that purging the key decrypts all the documents associated with this key."
+msgstr ""
