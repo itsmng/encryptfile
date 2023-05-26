@@ -63,3 +63,6 @@ msgstr "Documents associés"
 
 msgid "Unable to purge the key because documents are still associated with it"
 msgstr "Purge de la clé impossible car des documents lui sont toujours associés"
+
+msgid "Unable to drop encryptfile tables because there are still documents associated with the keys"
+msgstr "Impossible de supprimer les tables encryptfile car des documents sont toujours associés aux clés"

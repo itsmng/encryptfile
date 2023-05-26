@@ -66,3 +66,6 @@ msgstr ""
 msgid "Unable to purge the key because documents are still associated with it"
 msgstr ""
 
+msgid "Unable to drop encryptfile tables because there are still documents associated with the keys"
+msgstr ""
+
