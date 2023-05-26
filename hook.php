@@ -112,7 +112,11 @@ function plugin_encryptfile_uninstall() {
 
         return true;
     } else {
-        Session::addMessageAfterRedirect(__("Unable to drop encryptfile tables because there are still documents associated with the keys ", "encryptfile"), true, ERROR);
+        // Disable all key
+        $query = "UPDATE `glpi_plugin_encryptfile_configs` SET `status` = 0 WHERE 1";
+        $DB->queryOrDie($query, "Disable all encrypt keys");
+
+        Session::addMessageAfterRedirect(__("Unable to drop encryptfile tables because there are still documents associated with the keys", "encryptfile"), true, ERROR);
         return false;
     }
 }
