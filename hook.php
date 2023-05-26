@@ -112,7 +112,7 @@ function plugin_encryptfile_uninstall() {
 
         return true;
     } else {
-        Session::addMessageAfterRedirect(__("Unable to purge the key because documents are still associated with it", "encryptfile"), true, ERROR);
+        Session::addMessageAfterRedirect(__("Unable to drop encryptfile tables because there are still documents associated with the keys ", "encryptfile"), true, ERROR);
         return false;
     }
 }
