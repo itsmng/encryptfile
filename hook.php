@@ -96,15 +96,23 @@ function plugin_encryptfile_install() {
 function plugin_encryptfile_uninstall() {
     global $DB;
 
-    $queries = [
-        "glpi_plugin_encryptfile_configs"       => "DROP TABLE IF EXISTS `glpi_plugin_encryptfile_configs`;",
-        "glpi_plugin_encryptfile_profiles"      => "DROP TABLE IF EXISTS `glpi_plugin_encryptfile_profiles`;",
-        "glpi_plugin_encryptfile_items"         => "DROP TABLE IF EXISTS `glpi_plugin_encryptfile_items`;",
-        "glpi_plugin_encryptfile_documents"     => "DROP TABLE IF EXISTS `glpi_plugin_encryptfile_documents`;",
-        "glpi_plugin_encryptfile_formcreator"   => "DROP TABLE IF EXISTS `glpi_plugin_encryptfile_formcreator`;"
-    ];
+    $pluginEncryptfileConfigs = new PluginEncryptfileConfig();
+    $associatedDocuments = $pluginEncryptfileConfigs->getAllAssociatedDocument(0, true, true);
 
-    foreach($queries as $table => $query) $DB->queryOrDie($query, "Drop table ".$table);
+    if(empty($associatedDocuments)) {
+        $queries = [
+            "glpi_plugin_encryptfile_configs"       => "DROP TABLE IF EXISTS `glpi_plugin_encryptfile_configs`;",
+            "glpi_plugin_encryptfile_profiles"      => "DROP TABLE IF EXISTS `glpi_plugin_encryptfile_profiles`;",
+            "glpi_plugin_encryptfile_items"         => "DROP TABLE IF EXISTS `glpi_plugin_encryptfile_items`;",
+            "glpi_plugin_encryptfile_documents"     => "DROP TABLE IF EXISTS `glpi_plugin_encryptfile_documents`;",
+            "glpi_plugin_encryptfile_formcreator"   => "DROP TABLE IF EXISTS `glpi_plugin_encryptfile_formcreator`;"
+        ];
 
-    return true;
+        foreach($queries as $table => $query) $DB->queryOrDie($query, "Drop table ".$table);
+
+        return true;
+    } else {
+        Session::addMessageAfterRedirect(__("Unable to purge the key because documents are still associated with it", "encryptfile"), true, ERROR);
+        return false;
+    }
 }

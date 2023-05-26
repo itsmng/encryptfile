@@ -54,8 +54,9 @@ class PluginEncryptfileConfig extends CommonDBTM {
                 case __CLASS__ :
                     $tab[1] = __("Profile configuration", "encryptfile");
                     $tab[2] = __("Item configuration", "encryptfile");
+                    $tab[3] = __("Associated documents", "encryptfile");
                     if ((new Plugin())->isActivated('formcreator')) {
-                        $tab[3] = __("Formcreator configuration", "encryptfile");
+                        $tab[4] = __("Formcreator configuration", "encryptfile");
                     }
                     return $tab;
             }
@@ -82,7 +83,11 @@ class PluginEncryptfileConfig extends CommonDBTM {
                         $item->showItemForm();
                         break;
                     case 3 :
+                        $item->showAssociatedDocument();
+                        break;
+                    case 4 :
                         $item->showFormcreatorForm();
+                        break;
                 }
 
                 break;
@@ -177,7 +182,7 @@ class PluginEncryptfileConfig extends CommonDBTM {
         $this->showFormButtons($options);
 
         if(Session::haveRight("plugin_encryptfile_configs", PURGE)) {
-            echo __("Please note that purging the key decrypts all the documents associated with this key.", "encryptfile");
+            echo __("Please note that the key cannot be purged if documents are still associated with it.", "encryptfile");
         }
     
         return true;
@@ -354,6 +359,59 @@ class PluginEncryptfileConfig extends CommonDBTM {
         }
 
         echo "</table></div>";
+    }
+    
+    /**
+     * showAssociatedDocument
+     *
+     * @return void
+     */
+    function showAssociatedDocument() {
+        $associatedDocuments = $this->getAllAssociatedDocument($this->fields["id"], true);
+
+        // prepare params for search
+        $item            = new Document();
+        $searchOptions   = $item->rawSearchOptions();
+        $filteredOptions = [];
+
+        foreach ($searchOptions as $value) {
+            if (is_numeric($value['id']) && $value['id'] <= 7) {
+                $filteredOptions[$value['id']] = $value;
+            }
+        }
+
+        $searchOptions = $filteredOptions;
+        $sopt_keys     = array_keys($searchOptions);
+
+        $forcedisplay  = array_combine($sopt_keys, $sopt_keys);
+
+        $params["criteria"] = [];
+        $index = 0;
+
+        if(!empty($associatedDocuments)) {
+            foreach($associatedDocuments as $documentId) {
+                $params['criteria'][] = [
+                    "link"          => "OR",
+                    "field"         => 2,
+                    "searchtype"    => "equals",
+                    "value"         => $documentId
+                ];
+            }
+        } else {
+            $params['criteria'][] = [
+                "field"         => 2,
+                "searchtype"    => "equals",
+                "value"         => "0"
+            ];
+        }
+        
+        // do search
+        $params = Search::manageParams(Document::class, $params, false);
+        $data   = Search::prepareDatasForSearch(Document::class, $params, $forcedisplay);
+
+        Search::constructSQL($data);
+        Search::constructData($data);
+        Search::displayData($data);
     }
     
     /**
@@ -674,14 +732,18 @@ class PluginEncryptfileConfig extends CommonDBTM {
     static function afterPurgeDocument(Document $post) {
         global $DB;
 
-        $query = "DELETE FROM `glpi_plugin_encryptfile_documents` WHERE documents_id = ".$post->fields["id"];
-        $DB->query($query);
+        if(isset($post->input["_purge"]) && $post->input["_purge"]) {
+            $query = "DELETE FROM `glpi_plugin_encryptfile_documents` WHERE documents_id = ".$post->fields["id"];
+            $DB->query($query);
+        }
     }
 
-    function getAllAssociatedDocument($secretKeyId) {
+    function getAllAssociatedDocument($secretKeyId, $returnOnlyId = false, $uninstall = false) {
         global $DB;
 
-        $query = "SELECT documents_id FROM `glpi_plugin_encryptfile_documents` WHERE keys_id = $secretKeyId";
+        $query = "SELECT documents_id FROM `glpi_plugin_encryptfile_documents`";
+        if(!$uninstall) $query .= " WHERE keys_id = $secretKeyId";
+        
         $result = $DB->query($query);
 
         $Document = new Document();
@@ -692,8 +754,12 @@ class PluginEncryptfileConfig extends CommonDBTM {
             $document = $Document->find(["id" => $associatedDocument["documents_id"]]);
 
             if($document) foreach($document as $documentInformation) {
-                $associatedDocuments[$documentInformation["id"]]["filepath"] = $documentInformation["filepath"];
-                $associatedDocuments[$documentInformation["id"]]["filename"] = $documentInformation["filename"];
+                if(!$returnOnlyId) {
+                    $associatedDocuments[$documentInformation["id"]]["filepath"] = $documentInformation["filepath"];
+                    $associatedDocuments[$documentInformation["id"]]["filename"] = $documentInformation["filename"];
+                } else {
+                    $associatedDocuments[] = $documentInformation["id"];
+                }                
             }
         } 
 
