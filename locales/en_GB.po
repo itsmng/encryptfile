@@ -52,5 +52,11 @@ msgstr ""
 msgid "No associated form"
 msgstr ""
 
-msgid "Please note that purging the key decrypts all the documents associated with this key."
+msgid "Please note that the key cannot be purged if documents are still associated with it."
+msgstr ""
+
+msgid "Associated documents"
+msgstr ""
+
+msgid "Unable to purge the key because documents are still associated with it"
 msgstr ""
