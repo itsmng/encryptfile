@@ -54,10 +54,10 @@ class PluginEncryptfileConfig extends CommonDBTM {
                 case __CLASS__ :
                     $tab[1] = __("Profile configuration", "encryptfile");
                     $tab[2] = __("Item configuration", "encryptfile");
-                    $tab[3] = __("Associated documents", "encryptfile");
                     if ((new Plugin())->isActivated('formcreator')) {
-                        $tab[4] = __("Formcreator configuration", "encryptfile");
+                        $tab[3] = __("Formcreator configuration", "encryptfile");
                     }
+                    $tab[4] = __("Associated documents", "encryptfile");
                     return $tab;
             }
         }
@@ -83,10 +83,10 @@ class PluginEncryptfileConfig extends CommonDBTM {
                         $item->showItemForm();
                         break;
                     case 3 :
-                        $item->showAssociatedDocument();
+                        $item->showFormcreatorForm();
                         break;
                     case 4 :
-                        $item->showFormcreatorForm();
+                        $item->showAssociatedDocument();
                         break;
                 }
 
@@ -135,9 +135,17 @@ class PluginEncryptfileConfig extends CommonDBTM {
            'massiveaction'      => false,
            'autocomplete'       => true,
         ];
+
+        $tab[] = [
+            'id'                 => '2',
+            'table'              => $this->getTable(),
+            'field'              => 'status',
+            'name'               => __('Active'),
+            'datatype'           => 'bool'
+        ];
   
         $tab[] = [
-           'id'                 => '16',
+           'id'                 => '3',
            'table'              => $this->getTable(),
            'field'              => 'comment',
            'name'               => __('Comments'),
