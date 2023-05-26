@@ -51,15 +51,17 @@ function plugin_init_encryptfile() {
 		$PLUGIN_HOOKS['add_javascript']['encryptfile'][] = 'js/function.js';
 	}
 
-	$PluginEncryptfileConfig = new PluginEncryptfileConfig();
-	if(isset($_SESSION["glpiactiveprofile"]["id"])) {
-		$secretKeyId = $PluginEncryptfileConfig->getSecretKeyId($_SESSION["glpiactiveprofile"]["id"]);
-	}
-	
-	// Load js only if write right checked and have a configured key
-	if(Session::haveRight("plugin_encryptfile_encrypt", UPDATE) && !is_null($secretKeyId)) {
-		if(in_array(explode("?", $_SERVER['REQUEST_URI'])[0], $PluginEncryptfileConfig->getAuthorizedItem($secretKeyId))) {
-			$PLUGIN_HOOKS['add_javascript']['encryptfile'][] = 'js/write.js';
+	if ((new Plugin())->isInstalled('encryptfile')) {
+		$PluginEncryptfileConfig = new PluginEncryptfileConfig();
+		if(isset($_SESSION["glpiactiveprofile"]["id"])) {
+			$secretKeyId = $PluginEncryptfileConfig->getSecretKeyId($_SESSION["glpiactiveprofile"]["id"]);
+		}
+		
+		// Load js only if write right checked and have a configured key
+		if(Session::haveRight("plugin_encryptfile_encrypt", UPDATE) && !is_null($secretKeyId)) {
+			if(in_array(explode("?", $_SERVER['REQUEST_URI'])[0], $PluginEncryptfileConfig->getAuthorizedItem($secretKeyId))) {
+				$PLUGIN_HOOKS['add_javascript']['encryptfile'][] = 'js/write.js';
+			}
 		}
 	}
 }
