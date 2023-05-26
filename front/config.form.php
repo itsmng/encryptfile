@@ -34,10 +34,16 @@ if (isset($_POST["add"])) {
 	Html::redirect($CFG_GLPI["root_doc"] . "/plugins/encryptfile/front/config.php");
 } else if (isset($_POST["purge"])) {
 	$pluginEncryptfileConfigs->check($_POST["id"], PURGE);
-	$pluginEncryptfileEncrypt->decryptAllAssociatedDocuments($_POST["id"]);
-	$pluginEncryptfileConfigs->delete($_POST, 1);
-	$pluginEncryptfileConfigs->removeAssociatedConfig($_POST["id"]);
-	$pluginEncryptfileConfigs->redirectToList();
+	$associatedDocuments = $pluginEncryptfileConfigs->getAllAssociatedDocument($_POST["id"]);
+
+	if(empty($associatedDocuments)) {
+		$pluginEncryptfileConfigs->delete($_POST, 1);
+		$pluginEncryptfileConfigs->removeAssociatedConfig($_POST["id"]);
+		$pluginEncryptfileConfigs->redirectToList();
+	} else {
+		Session::addMessageAfterRedirect(__("Unable to purge the key because documents are still associated with it", "encryptfile"), true, ERROR);
+		Html::back();	 
+	}
 } else if (isset($_POST["update"])) {
 	$pluginEncryptfileConfigs->check($_POST["id"], UPDATE);
 	if(isset($_POST["profiles_id_reading"])) {
