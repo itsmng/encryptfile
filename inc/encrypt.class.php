@@ -165,6 +165,9 @@ class PluginEncryptfileEncrypt extends CommonDBTM {
                 if(!is_null($secretKeyId)) {
                     $PluginEncryptfileConfig->saveDocumentInfo($secretKeyId, $post->fields["id"]);
                 }
+                
+                $_SESSION["encryptfile"]["ticket"]["use_encrypt"] = 0;
+                $_SESSION["encryptfile"]["formcreator"]["use_encrypt"] = 0;
             }
         }
     }
