@@ -13,7 +13,10 @@
 $(document).ajaxStop(function() {
     setTimeout(function() {
         $('form').each(function() {
-            if (($(this).is('[action*="front/document.form.php"') || $(this).find('#fileupload_info_ticket').length == 1) && $('#encryptfile').length == 0) {
+            if (($(this).is('[action*="front/document.form.php"') 
+            || $(this).find('#fileupload_info_ticket').length == 1 
+            || $(this).find('#fileupload_info').length == 1) 
+            && $('#encryptfile').length == 0) {
                 addEncryptedFileCheckbox($(this));
             }
         });
@@ -23,13 +26,19 @@ $(document).ajaxStop(function() {
 function addEncryptedFileCheckbox(form) {
     var RegexUrl = /^(.*)front\/.*\.form\.php/;
     var RegexUrlRes = RegexUrl.exec(window.location.pathname);
+    
+    var center = "left";
+    if(form.find('#fileupload_info_ticket').length == 1) {
+        center = "center";
+    }
 
     $.ajax({
         url : RegexUrlRes[1] + 'plugins/encryptfile/ajax/getItem.php',
         type : 'GET',
         dataType : 'html',
         data : {
-            'item_url' : RegexUrlRes[0]
+            'item_url'  : RegexUrlRes[0],
+            'center'    : center
         },
         success : function(data){
             var input = form.find('input[name="add"]');

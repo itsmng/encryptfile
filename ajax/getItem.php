@@ -22,10 +22,15 @@ if(isset($_GET["item_url"])) {
     
         if(!is_null($secretKeyId)) {
             $glpiItems = $PluginEncryptfileConfig->getAuthorizedItem($secretKeyId);
+            $center = "left";
+
+            if(isset($_GET["center"])) {
+                $center = $_GET["center"];
+            }
 
             foreach($glpiItems as $item) {
                 if(strpos($_GET["item_url"], $item) !== false) {
-                    $checkbox = '<div class="row" style="margin-bottom:10px;"><span class="form-group-checkbox"><input type="checkbox" class="new_checkbox" id="encryptfile" name="encryptfile" value="1" data-glpicore-ma-tags="common"><label class="label-checkbox" title="" for="encryptfile"> <span class="check"></span> <span class="box"></span>&nbsp;</label></span><label for="encryptfile">&nbsp;'.__("Encrypt the document", "encryptfile").'</label></div>';
+                    $checkbox = '<div class="row" style="margin-bottom:10px;text-align:'.$center.'!important;"><span class="form-group-checkbox"><input type="checkbox" class="new_checkbox" id="encryptfile" name="encryptfile" value="1" data-glpicore-ma-tags="common"><label class="label-checkbox" title="" for="encryptfile"> <span class="check"></span> <span class="box"></span>&nbsp;</label></span><label for="encryptfile">&nbsp;'.__("Encrypt the document", "encryptfile").'</label></div>';
                 }
             }
         }
