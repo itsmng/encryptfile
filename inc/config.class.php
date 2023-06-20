@@ -236,7 +236,8 @@ class PluginEncryptfileConfig extends CommonDBTM {
         
         $glpiObjects = [
             Ticket::class => Ticket::getTypeName(),
-            Document::class => Document::getTypeName()
+            Document::class => Document::getTypeName(),
+            "Helpdesk" => "Helpdesk"
         ];
 
         foreach(get_declared_classes() as $class){
@@ -717,15 +718,19 @@ class PluginEncryptfileConfig extends CommonDBTM {
      * @return void
      */
     public function getAuthorizedItem($secretKeyId) {
-        global $DB;
+        global $DB, $CFG_GLPI;
 
         $itemtypes = [];
 
         $query = "SELECT itemtype FROM `glpi_plugin_encryptfile_items` WHERE keys_id = $secretKeyId";
         $result = $DB->query($query);
-
+        
         if($result) foreach($result as $values) {
-            $itemtypes[] = $values["itemtype"]::getFormURL();
+            if($values["itemtype"] != "Helpdesk") {
+                $itemtypes[] = $values["itemtype"]::getFormURL();
+            } else {
+                $itemtypes[] = $CFG_GLPI["root_doc"]."/front/helpdesk.public.php";
+            }
         }
 
         return $itemtypes;

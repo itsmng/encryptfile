@@ -26,8 +26,14 @@ $(document).ajaxStop(function() {
 function addEncryptedFileCheckbox(form) {
     var RegexUrl = /^(.*)front\/.*\.form\.php/;
     var RegexUrlRes = RegexUrl.exec(window.location.pathname);
-    
     var center = "left";
+
+    if(RegexUrlRes == null) {
+        RegexUrl = /^(.*)front\/.*\.public\.php/;
+        RegexUrlRes = RegexUrl.exec(window.location.pathname);
+        center = "center";
+    }
+
     if(form.find('#fileupload_info_ticket').length == 1) {
         center = "center";
     }

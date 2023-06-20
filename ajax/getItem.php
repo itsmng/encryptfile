@@ -15,7 +15,13 @@ include("../../../inc/includes.php");
 $checkbox = '<input type="hidden" id="encryptfile">';
 
 if(isset($_GET["item_url"])) {
-    if(Session::haveRight("plugin_encryptfile_encrypt", UPDATE)) {
+	$canEncrypt = false;
+
+	if(isset($_SESSION["glpiID"])) {
+		$canEncrypt = Profile::haveUserRight($_SESSION["glpiID"], "plugin_encryptfile_encrypt", UPDATE, $_SESSION["glpiactive_entity"]);
+	}
+
+    if(Session::haveRight("plugin_encryptfile_encrypt", UPDATE) || $canEncrypt) {
         $PluginEncryptfileConfig = new PluginEncryptfileConfig();
         
         $secretKeyId = $PluginEncryptfileConfig->getSecretKeyId($_SESSION["glpiactiveprofile"]["id"]);

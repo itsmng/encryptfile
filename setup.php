@@ -37,13 +37,27 @@ function plugin_init_encryptfile() {
 	// Ticket attachment
 	$PLUGIN_HOOKS['pre_item_add']['encryptfile']['Ticket'] = array(PluginEncryptfileEncrypt::class, 'beforeAddTicket');
 
+	// Followup attachment
+	$PLUGIN_HOOKS['pre_item_add']['encryptfile']['ITILFollowup'] = array(PluginEncryptfileEncrypt::class, 'beforeAddFollowup');
+
+	//Task attachment
+	$PLUGIN_HOOKS['pre_item_add']['encryptfile']['TicketTask'] = array(PluginEncryptfileEncrypt::class, 'beforeAddTask');
+
 	// Formcreator submission
 	if ((new Plugin())->isActivated('formcreator')) {
 		$PLUGIN_HOOKS['pre_item_add']['encryptfile']['PluginFormcreatorFormAnswer'] = array(PluginEncryptfileEncrypt::class, 'beforeAddFormAnswer');
 	}
 
+	$canDecrypt = false;
+	$canEncrypt = false;
+
+	if(isset($_SESSION["glpiID"])) {
+		$canDecrypt = Profile::haveUserRight($_SESSION["glpiID"], "plugin_encryptfile_encrypt", READ, $_SESSION["glpiactive_entity"]);
+		$canEncrypt = Profile::haveUserRight($_SESSION["glpiID"], "plugin_encryptfile_encrypt", UPDATE, $_SESSION["glpiactive_entity"]);
+	}
+
 	// Load js only if read right checked
-	if(Session::haveRight("plugin_encryptfile_encrypt", READ)) {
+	if(Session::haveRight("plugin_encryptfile_encrypt", READ) || $canDecrypt) {
 		$PLUGIN_HOOKS['add_javascript']['encryptfile'][] = 'js/read.js';
 	}
 
@@ -58,7 +72,7 @@ function plugin_init_encryptfile() {
 		}
 		
 		// Load js only if write right checked and have a configured key
-		if(Session::haveRight("plugin_encryptfile_encrypt", UPDATE) && !is_null($secretKeyId)) {
+		if((Session::haveRight("plugin_encryptfile_encrypt", UPDATE) || $canEncrypt) && !is_null($secretKeyId)) {
 			if(in_array(explode("?", $_SERVER['REQUEST_URI'])[0], $PluginEncryptfileConfig->getAuthorizedItem($secretKeyId))) {
 				$PLUGIN_HOOKS['add_javascript']['encryptfile'][] = 'js/write.js';
 			}
