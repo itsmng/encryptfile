@@ -28,8 +28,16 @@ function addEncryptedFileCheckbox(form) {
     var RegexUrlRes = RegexUrl.exec(window.location.pathname);
     var center = "left";
 
+    // helpdesk.public.php
     if(RegexUrlRes == null) {
         RegexUrl = /^(.*)front\/.*\.public\.php/;
+        RegexUrlRes = RegexUrl.exec(window.location.pathname);
+        center = "center";
+    }
+
+    // tracking.injector.php
+    if(RegexUrlRes == null) {
+        RegexUrl = /^(.*)front\/.*\.injector\.php/;
         RegexUrlRes = RegexUrl.exec(window.location.pathname);
         center = "center";
     }

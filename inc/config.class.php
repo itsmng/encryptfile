@@ -730,6 +730,7 @@ class PluginEncryptfileConfig extends CommonDBTM {
                 $itemtypes[] = $values["itemtype"]::getFormURL();
             } else {
                 $itemtypes[] = $CFG_GLPI["root_doc"]."/front/helpdesk.public.php";
+                $itemtypes[] = $CFG_GLPI["root_doc"]."/front/tracking.injector.php";
             }
         }
 
