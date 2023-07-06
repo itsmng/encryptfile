@@ -17,7 +17,7 @@ $checkbox = '<input type="hidden" id="encryptfile">';
 if(isset($_GET["item_url"])) {
 	$canEncrypt = false;
 
-	if(isset($_SESSION["glpiID"])) {
+	if(isset($_SESSION["glpiID"]) && isset($_SESSION["glpiactiveprofile"]["interface"]) && $_SESSION["glpiactiveprofile"]["interface"] == "helpdesk") {
 		$canEncrypt = Profile::haveUserRight($_SESSION["glpiID"], "plugin_encryptfile_encrypt", UPDATE, $_SESSION["glpiactive_entity"]);
 	}
 

@@ -51,7 +51,7 @@ function plugin_init_encryptfile() {
 	$canDecrypt = false;
 	$canEncrypt = false;
 
-	if(isset($_SESSION["glpiID"])) {
+	if(isset($_SESSION["glpiID"]) && isset($_SESSION["glpiactiveprofile"]["interface"]) && $_SESSION["glpiactiveprofile"]["interface"] == "helpdesk") {
 		$canDecrypt = Profile::haveUserRight($_SESSION["glpiID"], "plugin_encryptfile_encrypt", READ, $_SESSION["glpiactive_entity"]);
 		$canEncrypt = Profile::haveUserRight($_SESSION["glpiID"], "plugin_encryptfile_encrypt", UPDATE, $_SESSION["glpiactive_entity"]);
 	}

@@ -135,10 +135,10 @@ class PluginEncryptfileEncrypt extends CommonDBTM {
     static function beforeAddDocument(Document $post) {
         $canEncrypt = false;
 
-        if(isset($_SESSION["glpiID"])) {
+        if(isset($_SESSION["glpiID"]) && isset($_SESSION["glpiactiveprofile"]["interface"]) && $_SESSION["glpiactiveprofile"]["interface"] == "helpdesk") {
             $canEncrypt = Profile::haveUserRight($_SESSION["glpiID"], "plugin_encryptfile_encrypt", UPDATE, $_SESSION["glpiactive_entity"]);
         }
-
+        
         if(Session::haveRight("plugin_encryptfile_encrypt", UPDATE) || $canEncrypt) {
             if((isset($post->input["encryptfile"]) && $post->input["encryptfile"] == 1) 
             || (isset($_SESSION["encryptfile"]["formcreator"]["use_encrypt"]) && $_SESSION["encryptfile"]["formcreator"]["use_encrypt"] == 1)) {
@@ -163,7 +163,7 @@ class PluginEncryptfileEncrypt extends CommonDBTM {
     static function afterAddDocument(Document $post) {
         $canEncrypt = false;
 
-        if(isset($_SESSION["glpiID"])) {
+        if(isset($_SESSION["glpiID"]) && isset($_SESSION["glpiactiveprofile"]["interface"]) && $_SESSION["glpiactiveprofile"]["interface"] == "helpdesk") {
             $canEncrypt = Profile::haveUserRight($_SESSION["glpiID"], "plugin_encryptfile_encrypt", UPDATE, $_SESSION["glpiactive_entity"]);
         }
 
@@ -177,9 +177,6 @@ class PluginEncryptfileEncrypt extends CommonDBTM {
                 if(!is_null($secretKeyId)) {
                     $PluginEncryptfileConfig->saveDocumentInfo($secretKeyId, $post->fields["id"]);
                 }
-                
-                $_SESSION["encryptfile"]["ticket"]["use_encrypt"] = 0;
-                $_SESSION["encryptfile"]["formcreator"]["use_encrypt"] = 0;
             }
         }
     }
@@ -196,7 +193,7 @@ class PluginEncryptfileEncrypt extends CommonDBTM {
 
         $canDecrypt = false;
 
-        if(isset($_SESSION["glpiID"])) {
+        if(isset($_SESSION["glpiID"]) && isset($_SESSION["glpiactiveprofile"]["interface"]) && $_SESSION["glpiactiveprofile"]["interface"] == "helpdesk") {
             $canDecrypt = Profile::haveUserRight($_SESSION["glpiID"], "plugin_encryptfile_encrypt", READ, $_SESSION["glpiactive_entity"]);
         }
 
@@ -228,7 +225,7 @@ class PluginEncryptfileEncrypt extends CommonDBTM {
     static function beforeAddTicket(Ticket $post) {
         $canEncrypt = false;
 
-        if(isset($_SESSION["glpiID"])) {
+        if(isset($_SESSION["glpiID"]) && isset($_SESSION["glpiactiveprofile"]["interface"]) && $_SESSION["glpiactiveprofile"]["interface"] == "helpdesk") {
             $canEncrypt = Profile::haveUserRight($_SESSION["glpiID"], "plugin_encryptfile_encrypt", UPDATE, $_SESSION["glpiactive_entity"]);
         }
 
@@ -261,7 +258,7 @@ class PluginEncryptfileEncrypt extends CommonDBTM {
     static function beforeAddFollowup(ITILFollowup $post) {
         $canEncrypt = false;
 
-        if(isset($_SESSION["glpiID"])) {
+        if(isset($_SESSION["glpiID"]) && isset($_SESSION["glpiactiveprofile"]["interface"]) && $_SESSION["glpiactiveprofile"]["interface"] == "helpdesk") {
             $canEncrypt = Profile::haveUserRight($_SESSION["glpiID"], "plugin_encryptfile_encrypt", UPDATE, $_SESSION["glpiactive_entity"]);
         }
 
@@ -294,7 +291,7 @@ class PluginEncryptfileEncrypt extends CommonDBTM {
     static function beforeAddTask(TicketTask $post) {
         $canEncrypt = false;
 
-        if(isset($_SESSION["glpiID"])) {
+        if(isset($_SESSION["glpiID"]) && isset($_SESSION["glpiactiveprofile"]["interface"]) && $_SESSION["glpiactiveprofile"]["interface"] == "helpdesk") {
             $canEncrypt = Profile::haveUserRight($_SESSION["glpiID"], "plugin_encryptfile_encrypt", UPDATE, $_SESSION["glpiactive_entity"]);
         }
 
@@ -327,7 +324,7 @@ class PluginEncryptfileEncrypt extends CommonDBTM {
     static function beforeAddFormAnswer(PluginFormcreatorFormAnswer $post) {
         $canEncrypt = false;
 
-        if(isset($_SESSION["glpiID"])) {
+        if(isset($_SESSION["glpiID"]) && isset($_SESSION["glpiactiveprofile"]["interface"]) && $_SESSION["glpiactiveprofile"]["interface"] == "helpdesk") {
             $canEncrypt = Profile::haveUserRight($_SESSION["glpiID"], "plugin_encryptfile_encrypt", UPDATE, $_SESSION["glpiactive_entity"]);
         }
 
