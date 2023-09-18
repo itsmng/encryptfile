@@ -12,6 +12,9 @@
  */
 define('PLUGIN_ENCRYPTFILE_VERSION', '1.1.1');
 
+define('PLUGIN_ENCRYPTFILE_MIN_ITSMNG', '1.5.1');
+define('PLUGIN_ENCRYPTFILE_MAX_ITSMNG', '1.5.1');
+
 /**
  * Init the hooks of the plugins -Needed
  **/
@@ -90,10 +93,10 @@ function plugin_version_encryptfile() {
 		'version'      => PLUGIN_ENCRYPTFILE_VERSION,
 		'author'       => 'Charlène AUGER',
 		'license'      => 'GPLv2+',
-		'homepage'     => '',
+		'homepage'     => 'https://github.com/itsmng/encryptfile',
 		'requirements' => [
 			'glpi' => [
-				'min' => '9.5',
+				'min' => PLUGIN_ENCRYPTFILE_MIN_ITSMNG,
 				'dev' => false
 			]
 		]
@@ -106,7 +109,7 @@ function plugin_version_encryptfile() {
  * Optional : check prerequisites before install : may print errors or add to message after redirect
  **/
 function plugin_encryptfile_check_prerequisites() {
-	if (version_compare(GLPI_VERSION, '9.5', 'lt') || version_compare(GLPI_VERSION, '9.6', 'ge')) {
+	if (version_compare(ITSM_VERSION, PLUGIN_ENCRYPTFILE_MIN_ITSMNG, 'lt') && version_compare(ITSM_VERSION, PLUGIN_ENCRYPTFILE_MAX_ITSMNG, 'ge')) {
 		return false;
 	}
 	
