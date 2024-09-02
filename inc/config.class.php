@@ -13,7 +13,7 @@
 
 class PluginEncryptfileConfig extends CommonDBTM {
     static $rightname = 'plugin_encryptfile_configs';
-    
+
     /**
      * getTypeName
      *
@@ -23,7 +23,7 @@ class PluginEncryptfileConfig extends CommonDBTM {
     public static function getTypeName($nb = 1) {
         return _n('Generate key', 'Generate keys', $nb, 'encryptfile');
     }
-    
+
     /**
      * getMenuContent
      *
@@ -37,10 +37,10 @@ class PluginEncryptfileConfig extends CommonDBTM {
         $menu['icon']               = "fas fa-key";
         $menu['links']['search']    = "/plugins/encryptfile/front/config.php";
         $menu['links']['add']       = "/plugins/encryptfile/front/config.form.php";
-        
+
         return $menu;
     }
-    
+
     /**
      * getTabNameForItem
      *
@@ -169,6 +169,7 @@ class PluginEncryptfileConfig extends CommonDBTM {
 
         $form = [
             'action' => $this->getFormURL(),
+            'itemtype' => self::getType(),
             'content' => [
                 $this->getTypeName() => [
                     'visible' => true,
