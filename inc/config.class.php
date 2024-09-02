@@ -63,7 +63,7 @@ class PluginEncryptfileConfig extends CommonDBTM {
         }
         return "";
     }
-    
+
     /**
      * displayTabContentForItem
      *
@@ -94,7 +94,7 @@ class PluginEncryptfileConfig extends CommonDBTM {
         }
         return true;
     }
-    
+
     /**
      * defineTabs
      *
@@ -111,7 +111,7 @@ class PluginEncryptfileConfig extends CommonDBTM {
     public static function giveItem($itemtype, $option_id, $data, $num) {
         return '';
     }
-    
+
     /**
      * rawSearchOptions
      *
@@ -119,12 +119,12 @@ class PluginEncryptfileConfig extends CommonDBTM {
      */
     function rawSearchOptions() {
         $tab = [];
-  
+
         $tab[] = [
            'id'                 => 'common',
            'name'               => __('Characteristics')
         ];
-  
+
         $tab[] = [
            'id'                 => '1',
            'table'              => $this->getTable(),
@@ -143,7 +143,7 @@ class PluginEncryptfileConfig extends CommonDBTM {
             'name'               => __('Active'),
             'datatype'           => 'bool'
         ];
-  
+
         $tab[] = [
            'id'                 => '3',
            'table'              => $this->getTable(),
@@ -151,12 +151,12 @@ class PluginEncryptfileConfig extends CommonDBTM {
            'name'               => __('Comments'),
            'datatype'           => 'text'
         ];
-  
+
         return $tab;
     }
 
 
-    
+
     /**
      * showForm
      *
@@ -244,7 +244,7 @@ class PluginEncryptfileConfig extends CommonDBTM {
         $rand = mt_rand();
 
         $this->showFormHeader(["formtitle" => __("Item configuration", "encryptfile")]);
-        
+
         $glpiObjects = [
             Ticket::class => Ticket::getTypeName(),
             Document::class => Document::getTypeName(),
@@ -260,24 +260,21 @@ class PluginEncryptfileConfig extends CommonDBTM {
             }
         );
 
-        $dd_params = [
-            'name'      => 'itemtype',
-            'values'    => $this->getItemtype($_GET["id"]),
-            'display'   => true,
-            'rand'      => $rand,
-            'multiple'  => true,
-            'size'      => 3
-        ];
-        
         echo "<tr class='tab_bg_2'><td width='50%'>".__('Select GLPi object', 'encryptfile')."</td><td>";
-        Dropdown::showFromArray($dd_params['name'], $glpiObjects, $dd_params);
+        renderTwigTemplate('macros/input.twig', [
+            'type'      => 'select',
+            'name'      => 'itemtype[]',
+            'values'    => $glpiObjects,
+            'value'     => array_values($this->getItemtype($_GET["id"])),
+            'multiple'  => true,
+        ]);
         echo "</td></tr>";
 
         $this->showFormButtons(['candel' => false]);
-    
+
         return true;
     }
-    
+
     /**
      * showFormcreatorForm
      *
@@ -314,10 +311,10 @@ class PluginEncryptfileConfig extends CommonDBTM {
         $this->showFormButtons(['candel' => false, "colspan" => 3]);
 
         $this->showFormcreatorConfigTable($_GET["id"]);
-    
+
         return true;
     }
-    
+
     /**
      * showFormcreatorConfigTable
      *
@@ -380,7 +377,7 @@ class PluginEncryptfileConfig extends CommonDBTM {
 
         echo "</table></div>";
     }
-    
+
     /**
      * showAssociatedDocument
      *
@@ -424,7 +421,7 @@ class PluginEncryptfileConfig extends CommonDBTM {
                 "value"         => "0"
             ];
         }
-        
+
         // do search
         $params = Search::manageParams(Document::class, $params, false);
         $data   = Search::prepareDatasForSearch(Document::class, $params, $forcedisplay);
@@ -433,7 +430,7 @@ class PluginEncryptfileConfig extends CommonDBTM {
         Search::constructData($data);
         Search::displayData($data);
     }
-    
+
     /**
      * removeFormConfig
      *
@@ -448,7 +445,7 @@ class PluginEncryptfileConfig extends CommonDBTM {
 
         return true;
     }
-    
+
     /**
      * removeAssociatedConfig
      *
@@ -470,7 +467,7 @@ class PluginEncryptfileConfig extends CommonDBTM {
 
         return true;
     }
-    
+
     /**
      * getProfiles
      *
@@ -488,13 +485,13 @@ class PluginEncryptfileConfig extends CommonDBTM {
 
         return $profiles;
     }
-    
+
     /**
      * getItemtype
      *
      * @param  mixed $id
      * @param  mixed $itemtype
-     * @return void
+     * @return array
      */
     function getItemtype($id, $itemtype = null) {
         global $DB;
@@ -536,7 +533,7 @@ class PluginEncryptfileConfig extends CommonDBTM {
 
         return $readingProfiles;
     }
-    
+
     /**
      * updateReadingProfiles
      *
@@ -555,7 +552,7 @@ class PluginEncryptfileConfig extends CommonDBTM {
             $DB->query($query);
         }
     }
-    
+
     /**
      * updateItemtype
      *
@@ -574,7 +571,7 @@ class PluginEncryptfileConfig extends CommonDBTM {
             $DB->query($query);
         }
     }
-    
+
     /**
      * updateFormcreator
      *
@@ -590,7 +587,7 @@ class PluginEncryptfileConfig extends CommonDBTM {
         $query = "INSERT INTO `glpi_plugin_encryptfile_formcreator`(keys_id,forms_id,sections_id,questions_id) VALUES($id,$form_id,$sections_id,$questions_id)";
         $DB->query($query);
     }
-    
+
     /**
      * removeItemtype
      *
@@ -602,7 +599,7 @@ class PluginEncryptfileConfig extends CommonDBTM {
 
         $DB->query("DELETE FROM `glpi_plugin_encryptfile_items` WHERE keys_id = $id");
     }
-    
+
     /**
      * removeReadingProfiles
      *
@@ -614,7 +611,7 @@ class PluginEncryptfileConfig extends CommonDBTM {
 
         $DB->query("DELETE FROM `glpi_plugin_encryptfile_profiles` WHERE keys_id = $id");
     }
-    
+
     /**
      * getSecretKey
      *
@@ -632,7 +629,7 @@ class PluginEncryptfileConfig extends CommonDBTM {
 
         $result = $this->find($search);
         if($result) foreach($result as $values) {
-            // Only if key is actived OR if purge 
+            // Only if key is actived OR if purge
             if($values["status"] || $purge) {
                 $secretKey = $values["key"];
             }
@@ -640,7 +637,7 @@ class PluginEncryptfileConfig extends CommonDBTM {
 
         return $secretKey;
     }
-    
+
     /**
      * getSecretKeyId
      *
@@ -660,7 +657,7 @@ class PluginEncryptfileConfig extends CommonDBTM {
 
         return $secretKeyId;
     }
-    
+
     /**
      * saveDocumentInfo
      *
@@ -676,7 +673,7 @@ class PluginEncryptfileConfig extends CommonDBTM {
 
         return true;
     }
-    
+
     /**
      * canRead
      *
@@ -686,7 +683,7 @@ class PluginEncryptfileConfig extends CommonDBTM {
      */
     public function canRead($activeProfile, $secretKeyId) {
         global $DB;
-        
+
         $secretKey = null;
 
         $query = "SELECT c.key, c.status FROM `glpi_plugin_encryptfile_configs` c LEFT JOIN `glpi_plugin_encryptfile_profiles` p on c.id = p.keys_id WHERE p.profiles_id = $activeProfile AND p.keys_id = $secretKeyId";
@@ -700,7 +697,7 @@ class PluginEncryptfileConfig extends CommonDBTM {
 
         return $secretKey;
     }
-    
+
     /**
      * isEncrypted
      *
@@ -721,7 +718,7 @@ class PluginEncryptfileConfig extends CommonDBTM {
 
         return $secretKeyId;
     }
-    
+
     /**
      * getAuthorizedItem
      *
@@ -735,7 +732,7 @@ class PluginEncryptfileConfig extends CommonDBTM {
 
         $query = "SELECT itemtype FROM `glpi_plugin_encryptfile_items` WHERE keys_id = $secretKeyId";
         $result = $DB->query($query);
-        
+
         if($result) foreach($result as $values) {
             if($values["itemtype"] != "Helpdesk") {
                 $itemtypes[] = $values["itemtype"]::getFormURL();
@@ -747,7 +744,7 @@ class PluginEncryptfileConfig extends CommonDBTM {
 
         return $itemtypes;
     }
-    
+
     /**
      * afterPurgeDocument
      *
@@ -768,7 +765,7 @@ class PluginEncryptfileConfig extends CommonDBTM {
 
         $query = "SELECT documents_id FROM `glpi_plugin_encryptfile_documents`";
         if(!$uninstall) $query .= " WHERE keys_id = $secretKeyId";
-        
+
         $result = $DB->query($query);
 
         $Document = new Document();
@@ -784,13 +781,13 @@ class PluginEncryptfileConfig extends CommonDBTM {
                     $associatedDocuments[$documentInformation["id"]]["filename"] = $documentInformation["filename"];
                 } else {
                     $associatedDocuments[] = $documentInformation["id"];
-                }                
+                }
             }
-        } 
+        }
 
         return $associatedDocuments;
     }
-    
+
     /**
      * getFormConfig
      *
