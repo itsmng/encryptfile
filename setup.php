@@ -28,11 +28,7 @@ function plugin_init_encryptfile() {
 
 	$PLUGIN_HOOKS['change_profile']['encryptfile']   = array(PluginEncryptfileProfile::class, 'initProfile');
 
-	if(Session::haveRight("plugin_encryptfile_configs", READ)) {
-        $PLUGIN_HOOKS['menu_toadd']['encryptfile'] = array('tools' => PluginEncryptfileConfig::class);
-    }
-
-	// Document 
+	// Document
 	$PLUGIN_HOOKS['pre_item_add']['encryptfile']['Document'] = array(PluginEncryptfileEncrypt::class, 'beforeAddDocument');
 	$PLUGIN_HOOKS['item_add']['encryptfile']['Document'] = array(PluginEncryptfileEncrypt::class, 'afterAddDocument');
 	$PLUGIN_HOOKS['item_purge']['encryptfile']['Document'] = array(PluginEncryptfileConfig::class, 'afterPurgeDocument');
@@ -59,21 +55,26 @@ function plugin_init_encryptfile() {
 		$canEncrypt = Profile::haveUserRight($_SESSION["glpiID"], "plugin_encryptfile_encrypt", UPDATE, $_SESSION["glpiactive_entity"]);
 	}
 
-	// Load js only if read right checked
-	if(Session::haveRight("plugin_encryptfile_encrypt", READ) || $canDecrypt) {
-		$PLUGIN_HOOKS['add_javascript']['encryptfile'][] = 'js/read.js';
-	}
 
-	if(Session::haveRight("plugin_encryptfile_configs", READ)) {
-		$PLUGIN_HOOKS['add_javascript']['encryptfile'][] = 'js/function.js';
-	}
-
-	if ((new Plugin())->isInstalled('encryptfile')) {
+	if ((new Plugin())->isActivated('encryptfile')) {
 		$PluginEncryptfileConfig = new PluginEncryptfileConfig();
 		if(isset($_SESSION["glpiactiveprofile"]["id"])) {
 			$secretKeyId = $PluginEncryptfileConfig->getSecretKeyId($_SESSION["glpiactiveprofile"]["id"]);
 		}
-		
+
+        if(Session::haveRight("plugin_encryptfile_configs", READ)) {
+            $PLUGIN_HOOKS['menu_toadd']['encryptfile'] = array('tools' => PluginEncryptfileConfig::class);
+        }
+
+        // Load js only if read right checked
+        if(Session::haveRight("plugin_encryptfile_encrypt", READ) || $canDecrypt) {
+            $PLUGIN_HOOKS['add_javascript']['encryptfile'][] = 'js/read.js';
+        }
+
+        if(Session::haveRight("plugin_encryptfile_configs", READ)) {
+            $PLUGIN_HOOKS['add_javascript']['encryptfile'][] = 'js/function.js';
+        }
+
 		// Load js only if write right checked and have a configured key
 		if((Session::haveRight("plugin_encryptfile_encrypt", UPDATE) || $canEncrypt) && !is_null($secretKeyId)) {
 			if(in_array(explode("?", $_SERVER['REQUEST_URI'])[0], $PluginEncryptfileConfig->getAuthorizedItem($secretKeyId))) {

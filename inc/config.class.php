@@ -167,35 +167,49 @@ class PluginEncryptfileConfig extends CommonDBTM {
     public function showForm($ID, $options = array()) {
         $rowspan = 2;
 
-        $this->initForm($ID, $options);
-        $this->showFormHeader($options);
-        
-        echo "<tr class='tab_bg_1'><td>".__('Name')."</td><td>";
-        Html::autocompletionTextField($this, "name", array('value' => $this->fields["name"]));
-        echo "</td>";
-
-        echo "<td rowspan='".$rowspan."'>".__('Comments')."</td>";
-        echo "<td rowspan='".$rowspan."'>";
-        echo "<textarea cols='45' rows='4' name='comment' >".$this->fields["comment"]."</textarea>";
-        echo "</td></tr>";
-
-        echo "<tr class='tab_bg_1'><td>".__('Default profile')."</td><td>";
-        Profile::Dropdown(array('name' => 'profiles_id', 'value' => $this->fields["profiles_id"]));
-        echo "</td></tr>";
-
-        echo "<tr class='tab_bg_1'><td>".__('Active')."</td><td>";
-        Dropdown::showFromArray("status", array(0 => __("No"), 1 => __("Yes")), array('value' => $this->fields["status"]));
-        echo "</td></tr>";
-
-        $this->showFormButtons($options);
+        $form = [
+            'action' => $this->getFormURL(),
+            'content' => [
+                $this->getTypeName() => [
+                    'visible' => true,
+                    'inputs' => [
+                        __('Name') => [
+                            'type' => 'text',
+                            'name' => 'name',
+                            'value' => $this->fields["name"] ?? '',
+                            'required' => true,
+                        ],
+                        __('Default profile') => [
+                            'type' => 'select',
+                            'name' => 'profiles_id',
+                            'itemtype' => Profile::class,
+                            'value' => $this->fields["profiles_id"] ?? '',
+                        ],
+                        __('Active') => [
+                            'type' => 'checkbox',
+                            'name' => 'status',
+                            'value' => $this->fields["status"] ?? '',
+                        ],
+                        __('Comments') => [
+                            'type' => 'textarea',
+                            'name' => 'comment',
+                            'value' => $this->fields["comment"] ?? '',
+                            'col_lg' => 12,
+                            'col_md' => 12,
+                        ],
+                    ],
+                ]
+            ],
+        ];
+        renderTwigForm($form, '', $this->fields);
 
         if(Session::haveRight("plugin_encryptfile_configs", PURGE)) {
             echo __("Please note that the key cannot be purged if documents are still associated with it.", "encryptfile");
         }
-    
+
         return true;
     }
-    
+
     /**
      * showProfileForm
      *
@@ -206,24 +220,21 @@ class PluginEncryptfileConfig extends CommonDBTM {
 
         $this->showFormHeader(["formtitle" => __("Profile configuration", "encryptfile")]);
 
-        $dd_params = [
-            'name'      => 'profiles_id_reading',
-            'values'    => $this->getReadingProfiles($_GET["id"]),
-            'display'   => true,
-            'rand'      => $rand,
-            'multiple'  => true,
-            'size'      => 3
-        ];
-        
         echo "<tr class='tab_bg_1'><td width='50%'>".__('Select reading profiles', 'encryptfile')."</td><td>";
-        Dropdown::showFromArray($dd_params['name'], $this->getProfiles(), $dd_params);
+        renderTwigTemplate('macros/input.twig', [
+            'type'      => 'select',
+            'name'      => 'profiles_id_reading[]',
+            'values'    => $this->getProfiles(),
+            'value'     => array_values($this->getReadingProfiles($_GET["id"])),
+            'multiple'  => true,
+        ]);
         echo "</td></tr>";
 
         $this->showFormButtons(['candel' => false]);
-    
+
         return true;
     }
-    
+
     /**
      * showItemForm
      *
@@ -501,13 +512,13 @@ class PluginEncryptfileConfig extends CommonDBTM {
 
         return $itemTypes;
     }
-        
+
     /**
      * getReadingProfiles
      *
      * @param  mixed $id
      * @param  mixed $profiles_id
-     * @return void
+     * @return array
      */
     function getReadingProfiles($id, $profiles_id = null) {
         global $DB;
