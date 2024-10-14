@@ -10,10 +10,10 @@
  *
  * --------------------------------------------------------------------------
  */
-define('PLUGIN_ENCRYPTFILE_VERSION', '1.1.1');
+define('PLUGIN_ENCRYPTFILE_VERSION', '2.0.0');
 
-define('PLUGIN_ENCRYPTFILE_MIN_ITSMNG', '1.5.1');
-define('PLUGIN_ENCRYPTFILE_MAX_ITSMNG', '1.5.1');
+define('PLUGIN_ENCRYPTFILE_MIN_ITSMNG', '2.0.0');
+define('PLUGIN_ENCRYPTFILE_MAX_ITSMNG', '2.0.0');
 
 /**
  * Init the hooks of the plugins -Needed
@@ -113,7 +113,7 @@ function plugin_encryptfile_check_prerequisites() {
 	if (version_compare(ITSM_VERSION, PLUGIN_ENCRYPTFILE_MIN_ITSMNG, 'lt') && version_compare(ITSM_VERSION, PLUGIN_ENCRYPTFILE_MAX_ITSMNG, 'ge')) {
 		return false;
 	}
-	
+
 	return true;
 }
 
